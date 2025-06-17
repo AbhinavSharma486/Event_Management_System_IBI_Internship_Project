@@ -76,24 +76,25 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <div id='features' className="py-16 sm:py-24 lg:py-32 bg-white">
+    <div id='features' className="py-16 sm:py-24 lg:py-32 bg-gradient-to-b from-[#f0f4ff] via-white to-[#fdfbff]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-16 sm:mb-20">
-          <motion.h2
+          <motion.h1
             initial="initial"
             whileInView="whileInView"
             variants={fadeUpVariants}
             viewport={{ once: true }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-teal-500 via-pink-500 to-yellow-400 text-transparent bg-clip-text"
           >
             Everything You Need to Succeed
-          </motion.h2>
+          </motion.h1>
+
           <motion.p
             initial="initial"
             whileInView="whileInView"
             variants={fadeUpVariants}
             viewport={{ once: true }}
-            className="mt-4 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto"
+            className="mt-4 text-lg sm:text-xl bg-gradient-to-r from-gray-700 via-neutral-800 to-gray-600 text-transparent bg-clip-text max-w-2xl mx-auto"
           >
             Powerful features designed to make event management simple, efficient, and effective.
           </motion.p>

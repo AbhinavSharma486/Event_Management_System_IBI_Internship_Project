@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 
-// Define animation variants locally
+// Animation variants
 const fadeUpVariants = {
   initial: { opacity: 0, y: 50 },
   whileInView: { opacity: 1, y: 0, transition: { duration: 1.0, ease: "easeOut" } },
@@ -24,7 +24,7 @@ const itemVariants = {
   whileInView: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
 
-// Local data
+// Testimonial data
 const testimonials = [
   {
     name: 'Sarah Johnson',
@@ -62,26 +62,26 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <div className="py-16 sm:py-24 lg:py-32 bg-white">
+    <div className="py-20 bg-gradient-to-br from-indigo-50 via-white to-pink-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-16 sm:mb-20">
-          <motion.h2
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <motion.h1
             initial="initial"
             whileInView="whileInView"
             variants={fadeUpVariants}
             viewport={{ once: true }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900"
+            className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-fuchsia-600 via-amber-500 to-lime-400 text-transparent bg-clip-text"
           >
             Trusted by Event Professionals
-          </motion.h2>
+          </motion.h1>
           <motion.p
             initial="initial"
             whileInView="whileInView"
             variants={fadeUpVariants}
             viewport={{ once: true }}
-            className="mt-4 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto"
+            className="mt-4 text-lg sm:text-xl bg-gradient-to-r from-gray-700 to-gray-500 text-transparent bg-clip-text max-w-2xl mx-auto"
           >
-            Join thousands of event creators who have transformed their workflow.
+            Join thousands of creators who revolutionize events with EventFlow.
           </motion.p>
         </div>
 
@@ -90,18 +90,18 @@ const TestimonialsSection = () => {
           whileInView="whileInView"
           variants={staggerContainerVariants}
           viewport={{ once: true, amount: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-gray-50 rounded-xl p-6 shadow-md border border-gray-100"
+              className="rounded-2xl p-6 bg-white/60 backdrop-blur-md border border-white/40 shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <div className="flex items-center mb-4">
-                <img src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full" />
+                <img src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full shadow-sm" />
                 <div className="ml-4">
-                  <h3 className="font-bold text-gray-900">{testimonial.name}</h3>
+                  <h3 className="font-semibold text-gray-900">{testimonial.name}</h3>
                   <p className="text-sm text-gray-600">{testimonial.role}, {testimonial.company}</p>
                 </div>
               </div>
@@ -109,11 +109,12 @@ const TestimonialsSection = () => {
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-5 w-5 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                    className={`h-5 w-5 transition-transform ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400 drop-shadow-md' : 'text-gray-300'
+                      }`}
                   />
                 ))}
               </div>
-              <p className="text-gray-600 italic">"{testimonial.quote}"</p>
+              <p className="text-gray-700 italic leading-relaxed">"{testimonial.quote}"</p>
             </motion.div>
           ))}
         </motion.div>

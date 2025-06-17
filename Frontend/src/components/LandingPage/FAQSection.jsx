@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown } from 'lucide-react';
 
-// Define animation variants locally
 const fadeUpVariants = {
   initial: { opacity: 0, y: 50 },
   whileInView: { opacity: 1, y: 0, transition: { duration: 1.0, ease: "easeOut" } },
@@ -24,7 +23,6 @@ const itemVariants = {
   whileInView: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-// Local data
 const faqs = [
   {
     question: 'How quickly can I set up my first event?',
@@ -60,64 +58,70 @@ const FAQSection = () => {
   };
 
   return (
-    <div className="py-16 sm:py-24 lg:py-32 bg-gray-50">
+    <section className="py-20 sm:py-28 bg-gradient-to-br from-gray-100 to-gray-200">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto text-center mb-16 sm:mb-20">
-          <motion.h2
-            initial="initial"
-            whileInView="whileInView"
-            variants={fadeUpVariants}
-            viewport={{ once: true }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900"
-          >
+        <motion.div
+          className="max-w-3xl mx-auto text-center mb-16 sm:mb-20"
+          initial="initial"
+          whileInView="whileInView"
+          variants={fadeUpVariants}
+          viewport={{ once: true }}
+        >
+          <h1 className="group text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 bg-clip-text text-transparent transition duration-300">
             Frequently Asked Questions
-          </motion.h2>
-          <motion.p
-            initial="initial"
-            whileInView="whileInView"
-            variants={fadeUpVariants}
-            viewport={{ once: true }}
-            className="mt-4 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto"
-          >
-            Everything you need to know about EventFlow. Can't find an answer? Contact us.
-          </motion.p>
-        </div>
+          </h1>
+          <p className="mt-4 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+            Everything you need to know about EventFlow. Can’t find what you’re looking for? Reach out to our support team anytime.
+          </p>
+        </motion.div>
 
         <motion.div
           initial="initial"
           whileInView="whileInView"
           variants={staggerContainerVariants}
-          viewport={{ once: true, amount: 0.1 }}
-          className="max-w-3xl mx-auto space-y-4"
+          viewport={{ once: true, amount: 0.2 }}
+          className="max-w-3xl mx-auto space-y-5"
         >
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden"
+              className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300"
             >
               <button
                 onClick={() => toggleFAQ(index)}
-                className="w-full flex justify-between items-center p-6 text-left"
+                className="w-full flex justify-between items-center px-6 py-5 text-left group"
               >
-                <h3 className="text-lg font-semibold text-gray-900">{faq.question}</h3>
-                {openIndex === index ? (
-                  <ChevronUp className="h-5 w-5 text-purple-600" />
-                ) : (
+                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+                  {faq.question}
+                </h3>
+                <motion.div
+                  animate={{ rotate: openIndex === index ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <ChevronDown className="h-5 w-5 text-purple-600" />
-                )}
+                </motion.div>
               </button>
 
-              {openIndex === index && (
-                <div className="px-6 pb-6 text-gray-600">
-                  {faq.answer}
-                </div>
-              )}
+              <AnimatePresence>
+                {openIndex === index && (
+                  <motion.div
+                    key="answer"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden px-6 pb-5 text-gray-600 text-base leading-relaxed"
+                  >
+                    {faq.answer}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           ))}
         </motion.div>
       </div>
-    </div>
+    </section>
   );
 };
 

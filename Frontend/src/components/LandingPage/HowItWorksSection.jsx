@@ -41,9 +41,9 @@ const HowItWorksSection = () => {
             <Rocket className="h-4 w-4 mr-2" />
             <span>Simple Process</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
             How EventFlow Works
-          </h2>
+          </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Get started in minutes with our intuitive three-step process
           </p>
