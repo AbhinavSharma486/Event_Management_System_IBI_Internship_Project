@@ -17,11 +17,11 @@ const Navbar = () => {
             <div className="w-8 h-8 sm:w-10 sm:h-10 backdrop-blur-sm rounded-xl flex items-center justify-center">
               <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white cursor-pointer" />
             </div>
-            <span className="ml-2 sm:ml-3 text-xl sm:text-2xl font-bold text-white cursor-pointer">EventFlow</span>
+            <span className="ml-2 sm:ml-3 text-2xl sm:text-2xl font-bold text-white cursor-pointer">EventFlow</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-8 font-bold text-xl">
             <a href="#features" className="text-white hover:text-purple-200 transition-colors duration-200">
               Features
             </a>
@@ -34,7 +34,7 @@ const Navbar = () => {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 font-bold text-xl">
             <Link
               to="/login"
               className="text-white hover:text-purple-200 transition-colors duration-200"
@@ -71,42 +71,42 @@ const Navbar = () => {
           >
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="absolute top-4 right-4 text-white focus:outline-none p-2 rounded-full hover:bg-white/10"
+              className="absolute top-4 right-4 text-black focus:outline-none p-2 rounded-full hover:bg-white/10"
             >
               <X className="h-8 w-8" />
             </button>
 
             <a
               href="#features"
-              className="text-white text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
+              className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Features
             </a>
             <a
               href="#testimonials"
-              className="text-white text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
+              className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Reviews
             </a>
             <a
               href="#contact"
-              className="text-white text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
+              className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Contact
             </a>
             <Link
               to="/login"
-              className="text-white text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
+              className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Sign in
             </Link>
             <Link
               to="/register"
-              className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg hover:bg-white/30 transition-all duration-200 text-2xl font-semibold"
+              className="bg-amber-500 backdrop-blur-sm text-black px-6 py-3 rounded-lg hover:bg-white/30 transition-all duration-200 text-2xl font-semibold"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Get Started
