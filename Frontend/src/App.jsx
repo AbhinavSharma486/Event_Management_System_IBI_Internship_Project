@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 import Navbar from "./components/Navbar";
 import Footer from './components/Footer';
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from './pages/RegisterPage';
 
 const fadeUpVariants = {
   initial: { opacity: 0, y: 50 },
@@ -20,6 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </div>
       <Footer />

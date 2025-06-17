@@ -1,31 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
 import {
-  Calendar, Users, BarChart3, Zap, Shield, Clock, ArrowRight, Star, CheckCircle, Play,
-  Globe, TrendingUp, Heart, MessageCircle, Share2, Sparkles, Target, Rocket, MapPin,
-  Mail, Phone, Menu, X,
+  Calendar, Menu, X,
 } from 'lucide-react';
-
-
-const icons = {
-  Calendar, Users, BarChart3, Zap, Shield, Clock, ArrowRight, Star, CheckCircle, Play,
-  Globe, TrendingUp, Heart, MessageCircle, Share2, Sparkles, Target, Rocket, MapPin,
-  Mail, Phone, Menu, X,
-};
-
-
-const fadeUpVariants = {
-  initial: { opacity: 0, y: 50 },
-  whileInView: { opacity: 1, y: 0, transition: { duration: 1.0, ease: "easeOut" } },
-};
-
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const { Calendar, Menu, X } = icons;
 
   return (
     <header className="absolute top-0 w-full z-50">
@@ -34,7 +15,7 @@ const Navbar = () => {
         <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8">
           <Link to="/" className="flex items-center">
             <div className="w-8 h-8 sm:w-10 sm:h-10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <Calendar path="/" className="h-5 w-5 sm:h-6 sm:w-6 text-white cursor-pointer" />
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white cursor-pointer" />
             </div>
             <span className="ml-2 sm:ml-3 text-xl sm:text-2xl font-bold text-white cursor-pointer">EventFlow</span>
           </Link>
@@ -133,12 +114,6 @@ const Navbar = () => {
           </motion.div>
         )}
 
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 -right-20 w-40 h-40 sm:w-80 sm:h-80 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-20 -left-20 w-40 h-40 sm:w-80 sm:h-80 bg-yellow-400/20 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 sm:w-96 sm:h-96 bg-pink-400/10 rounded-full blur-3xl"></div>
-        </div>
       </div>
     </header >
   );
