@@ -32,12 +32,12 @@ const Navbar = () => {
       <div className="relative z-10">
         {/* Navigation */}
         <nav className="flex items-center justify-between p-4 sm:p-6 lg:px-8">
-          <div className="flex items-center">
-            <div className="w-8 h-8 sm:w-10 sm:h-10backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          <Link to="/" className="flex items-center">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 backdrop-blur-sm rounded-xl flex items-center justify-center">
+              <Calendar path="/" className="h-5 w-5 sm:h-6 sm:w-6 text-white cursor-pointer" />
             </div>
-            <span className="ml-2 sm:ml-3 text-xl sm:text-2xl font-bold text-white">EventFlow</span>
-          </div>
+            <span className="ml-2 sm:ml-3 text-xl sm:text-2xl font-bold text-white cursor-pointer">EventFlow</span>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-8">

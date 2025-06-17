@@ -62,7 +62,7 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <div className="py-20 bg-gradient-to-br from-indigo-50 via-white to-pink-50">
+    <div id='testimonials' className="py-20 bg-gradient-to-br from-indigo-50 via-white to-pink-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <motion.h1
