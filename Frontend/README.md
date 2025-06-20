@@ -1,12 +1,96 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+.
+└── Event Management System/
+    ├── Frontend/
+    │   ├── vite.config.js
+    │   ├── tailwind.config.js
+    │   ├── package.json
+    │   ├── .env
+    │   └── src /
+    │       ├── hooks/
+    │       │   ├── useAuth.js
+    │       │   ├── useEvents.js
+    │       │   └── useUpload.js
+    │       ├── routes/
+    │       │   ├── AppRoutes.jsx
+    │       │   └── ProtectdRoute.jsx
+    │       ├── styles/
+    │       │   ├── global.css 
+    │       │   ├── tailwind.css
+    │       │   └── assets/
+    │       │       ├── images/
+    │       │       ├── logos/
+    │       │       └── banners/
+    │       ├── store/
+    │       │   ├── useStore.js
+    │       │   ├── eventStore.js
+    │       │   └── uiStore.js
+    │       ├── pages/
+    │       │   ├── Home.jsx
+    │       │   ├── Login.jsx
+    │       │   ├── Register.jsx
+    │       │   ├── Dashboard.jsx
+    │       │   ├── Events.jsx
+    │       │   ├── CreateEvent.jsx
+    │       │   ├── EventDetail.jsx
+    │       │   ├── Calendar.jsx
+    │       │   ├── Analytics.jsx
+    │       │   └── Profile.jsx
+    │       ├── components/
+    │       │   ├── ui/
+    │       │   ├── layout/
+    │       │   ├── forms/
+    │       │   └── charts/
+    │       └── services/
+    │           ├── api.js
+    │           ├── authService.js
+    │           ├── eventService.js
+    │           ├── uploadService.js
+    │           └── utils/
+    │               ├── constants.js
+    │               └── helper.js
+    └── Backend/
+        ├── server.js
+        ├── app.js
+        ├── package.json
+        ├── .env
+        └── src/
+            ├── utils/
+            │   ├── validators.js
+            │   ├── logger.js
+            │   └── config/
+            │       ├── database.js
+            │       ├── jwt.js
+            │       └── cloudinary.js
+            ├── database/
+            │   ├── connection.js
+            │   ├── seeds/
+            │   └── migrations/
+            ├── services/
+            │   ├── authService.js
+            │   ├── eventService.js
+            │   ├── fileService.js
+            │   ├── emailService.js
+            │   └── analyticsService.js
+            ├── middleware/
+            │   ├── authMiddleware.js
+            │   ├── uploadMiddleware.js
+            │   ├── validationMiddleware.js
+            │   ├── errorMiddleware.js
+            │   └── corsMiddleware.js
+            ├── models/
+            │   ├── User.js
+            │   ├── Event.js
+            │   ├── Attendee.js
+            │   └── Media.js
+            ├── controllers/
+            │   ├── authController.js
+            │   ├── eventController.js
+            │   ├── attendeeController.js
+            │   ├── uploadController.js
+            │   └── analyticsController.js
+            └── routes/
+                ├── authRoutes.js
+                ├── eventRoutes.js
+                ├── attendeeRoutes.js
+                ├── uploadRoutes.js
+                └── analyticsRoutes.js
