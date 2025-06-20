@@ -25,7 +25,7 @@ const initialEvents = [
     date: '2025-07-01',
     time: '10:00 AM',
     status: 'published',
-    image: 'https://via.placeholder.com/400x200',
+    image: 'https://images.pexels.com/photos/573589/pexels-photo-573589.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     currentAttendees: 120,
     maxAttendees: 200,
   },
@@ -37,7 +37,7 @@ const initialEvents = [
     date: '2025-07-15',
     time: '2:00 PM',
     status: 'draft',
-    image: '',
+    image: 'https://images.pexels.com/photos/716411/pexels-photo-716411.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
     currentAttendees: 45,
     maxAttendees: 100,
   },
@@ -68,7 +68,7 @@ const EventsPage = () => {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-purple-600 via-blue-500 to-indigo-600 min-h-screen pt-30 pb-10 px-4 sm:px-6 lg:px-8">
+    <div className="space-y-8 bg-gradient-to-br from-gray-800 to-blue-900 min-h-screen pt-30 pb-10 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -87,7 +87,6 @@ const EventsPage = () => {
       {/* Filters and Search */}
       <div className="bg-white rounded-lg shadow p-3 sm:p-4">
         <div className="flex flex-col gap-4 sm:flex-col md:flex-row md:items-center md:justify-between">
-
           {/* Search */}
           <div className="w-full">
             <div className="relative">
@@ -134,7 +133,6 @@ const EventsPage = () => {
               List
             </button>
           </div>
-
         </div>
       </div>
 
@@ -160,13 +158,14 @@ const EventsPage = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredEvents.map((event, index) => (
-              <motion.div
+              <motion.div // This motion.div is now the clickable area
                 key={event.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-xl shadow-lg hover:shadow-xl overflow-hidden"
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl overflow-hidden cursor-pointer relative" // Added relative for absolute positioning of icons
               >
+                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link> {/* Overlay Link */}
                 {event.image && (
                   <img src={event.image} alt={event.title} className="w-full h-48 object-cover" />
                 )}
@@ -174,13 +173,13 @@ const EventsPage = () => {
                   <div className="flex justify-between items-center mb-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${event.status === 'published' ? 'bg-green-100 text-green-800' : event.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{event.status}</span>
                     <div className="flex gap-1">
-                      <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600">
+                      <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600 relative z-20">
                         <Eye className="h-4 w-4" />
                       </Link>
-                      <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600">
+                      <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600 relative z-20">
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <button onClick={() => handleDeleteEvent(event.id, event.title)} className="text-gray-400 hover:text-red-600">
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }} className="text-gray-400 hover:text-red-600 relative z-20">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -208,13 +207,14 @@ const EventsPage = () => {
         ) : (
           <div className="bg-white rounded-xl shadow divide-y">
             {filteredEvents.map((event, index) => (
-              <motion.div
+              <motion.div // This motion.div is now the clickable area
                 key={event.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center hover:bg-gray-50"
+                className="p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center hover:bg-gray-50 cursor-pointer relative" // Added relative for absolute positioning of icons
               >
+                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link> {/* Overlay Link */}
                 {event.image && (
                   <img src={event.image} alt={event.title} className="w-24 h-24 object-cover rounded-lg" />
                 )}
@@ -231,10 +231,10 @@ const EventsPage = () => {
                     <div className="flex items-center"><Users className="h-4 w-4 mr-1" /> {event.currentAttendees}/{event.maxAttendees}</div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600"><Eye className="h-5 w-5" /></Link>
-                  <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600"><Edit className="h-5 w-5" /></Link>
-                  <button onClick={() => handleDeleteEvent(event.id, event.title)} className="text-gray-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></button>
+                <div className="flex gap-2 relative z-20"> {/* Add z-20 here to ensure buttons are clickable */}
+                  <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600" onClick={(e) => e.stopPropagation()}><Eye className="h-5 w-5" /></Link> {/* Prevent bubbling */}
+                  <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600" onClick={(e) => e.stopPropagation()}><Edit className="h-5 w-5" /></Link> {/* Prevent bubbling */}
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }} className="text-gray-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></button> {/* Prevent bubbling */}
                 </div>
               </motion.div>
             ))}
