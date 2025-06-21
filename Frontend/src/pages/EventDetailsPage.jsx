@@ -167,51 +167,51 @@ const EventDetailsPage = () => {
     }
   };
 
+  // Common Back Button Component
+  const BackButton = ({ className = '' }) => (
+    <Link
+      to="/events"
+      className={`inline-flex items-center justify-center px-6 py-3 border border-transparent text-white font-medium rounded-3xl shadow-sm bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-colors duration-200 ${className}`}
+    >
+      <ArrowLeft className="mr-2 h-5 w-5" />
+      Back to Events
+    </Link>
+  );
+
   if (!event) {
     return (
       <div className="text-center py-12 px-4">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">Event not found</h2>
-        <Link
-          to="/events"
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-purple-600 hover:text-purple-700"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Events
-        </Link>
+        <BackButton /> {/* Using the common BackButton component */}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8 space-y-8 pt-30 pb-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-400 to-cyan-300">
+    <div className="min-h-screen py-8 space-y-8 pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-400 to-cyan-300">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <Link
-          to="/events"
-          className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Events
-        </Link>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        {/* Converted "Back to Events" to a button */}
+        <BackButton className="mb-4 sm:mb-0" /> {/* Added mb-4 for mobile spacing */}
 
-        <div className="flex flex-wrap items-center space-x-3 sm:space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-wrap justify-end min-w-0"> {/* Added min-w-0 and justify-end for tight spacing */}
           <button
             onClick={() => toast.success('Event link copied to clipboard!')}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200"
+            className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200 whitespace-nowrap" // Reduced padding, added whitespace-nowrap
           >
             <Share2 className="mr-2 h-4 w-4" />
             Share
           </button>
           <Link
             to={`/events/${event.id}/edit`}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+            className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200 whitespace-nowrap" // Reduced padding, added whitespace-nowrap
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </Link>
           <button
             onClick={handleDeleteEvent}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200"
+            className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 transition-colors duration-200 whitespace-nowrap" // Reduced padding, added whitespace-nowrap
           >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
@@ -225,7 +225,7 @@ const EventDetailsPage = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative h-48 sm:h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden"
+          className="relative h-48 sm:h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden mb-8"
         >
           <img
             src={event.banner}
@@ -343,7 +343,7 @@ const EventDetailsPage = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="bg-white rounded-xl shadow-lg p-6 sm:p-8"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                 Attendees ({event.attendees.length})
               </h3>
@@ -379,7 +379,7 @@ const EventDetailsPage = () => {
                     onChange={(e) => setNewAttendee({ ...newAttendee, email: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <button
                       type="submit"
                       className="flex-1 bg-purple-600 text-white px-3 py-2 rounded-md hover:bg-purple-700 transition-colors duration-200 text-sm sm:text-base"
@@ -481,6 +481,11 @@ const EventDetailsPage = () => {
             </div>
           </motion.div>
         </div>
+      </div>
+
+      {/* Back to Events Button at the bottom center */}
+      <div className="flex justify-center mt-12"> {/* Added mt-12 for top margin */}
+        <BackButton />
       </div>
     </div>
   );
