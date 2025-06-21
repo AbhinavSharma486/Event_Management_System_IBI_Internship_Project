@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import {
   Plus,
   Search,
-  Filter,
   Calendar,
   MapPin,
   Users,
@@ -85,10 +84,10 @@ const EventsPage = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow p-3 sm:p-4">
-        <div className="flex flex-col gap-4 sm:flex-col md:flex-row md:items-center md:justify-between">
-          {/* Search */}
-          <div className="w-full">
+      <div className="bg-white rounded-lg shadow p-3 sm:p-4 max-w-4xl mx-auto">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:flex-row md:items-center md:justify-between">
+          {/* Search Input */}
+          <div className="w-full sm:w-auto sm:flex-1">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
@@ -103,23 +102,8 @@ const EventsPage = () => {
             </div>
           </div>
 
-          {/* Filter */}
-          <div className="w-full flex items-center gap-2 sm:justify-start md:justify-end">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full sm:w-auto text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              <option value="all">All Status</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
           {/* View Mode Toggle */}
-          <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start md:justify-end gap-2 bg-gray-100 rounded-md px-2 py-1">
+          <div className="w-full sm:w-auto flex items-center justify-center sm:justify-end gap-2 bg-gray-100 rounded-md px-2 py-1">
             <button
               onClick={() => setViewMode('grid')}
               className={`w-1/2 sm:w-auto text-sm px-3 py-1 rounded-md font-medium transition ${viewMode === 'grid' ? 'bg-white text-purple-600 shadow' : 'text-gray-600 hover:text-gray-900'}`}
@@ -158,14 +142,14 @@ const EventsPage = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredEvents.map((event, index) => (
-              <motion.div // This motion.div is now the clickable area
+              <motion.div
                 key={event.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-xl shadow-lg hover:shadow-xl overflow-hidden cursor-pointer relative" // Added relative for absolute positioning of icons
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl overflow-hidden cursor-pointer relative"
               >
-                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link> {/* Overlay Link */}
+                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link>
                 {event.image && (
                   <img src={event.image} alt={event.title} className="w-full h-48 object-cover" />
                 )}
@@ -188,7 +172,7 @@ const EventsPage = () => {
                   <p className="text-sm text-gray-600 mb-3 truncate">{event.description}</p>
                   <div className="text-sm text-gray-500 space-y-1">
                     <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" /> {format(new Date(event.date), 'MMM d, yyyy')}
+                      <Calendar className="h-4 w-4 mr-2" /> {format(new Date(event.date), 'MMM d,yyyy')}
                     </div>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2" /> {event.time}
@@ -207,34 +191,34 @@ const EventsPage = () => {
         ) : (
           <div className="bg-white rounded-xl shadow divide-y">
             {filteredEvents.map((event, index) => (
-              <motion.div // This motion.div is now the clickable area
+              <motion.div
                 key={event.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center hover:bg-gray-50 cursor-pointer relative" // Added relative for absolute positioning of icons
+                className="p-4 flex flex-col sm:flex-row gap-4 items-center sm:items-start hover:bg-gray-50 cursor-pointer relative"
               >
-                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link> {/* Overlay Link */}
+                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link>
                 {event.image && (
-                  <img src={event.image} alt={event.title} className="w-24 h-24 object-cover rounded-lg" />
+                  <img src={event.image} alt={event.title} className="w-full h-32 sm:w-48 object-cover rounded-lg flex-shrink-0" />
                 )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center mb-1">
-                    <h3 className="text-lg font-medium text-gray-900 truncate">{event.title}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${event.status === 'published' ? 'bg-green-100 text-green-800' : event.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{event.status}</span>
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2 sm:gap-0">
+                    <h3 className="text-lg font-medium text-gray-900 truncate flex-grow">{event.title}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${event.status === 'published' ? 'bg-green-100 text-green-800' : event.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} flex-shrink-0`}>{event.status}</span>
                   </div>
                   <p className="text-sm text-gray-600 truncate mb-2">{event.description}</p>
-                  <div className="flex flex-wrap gap-x-6 text-sm text-gray-500">
-                    <div className="flex items-center"><Calendar className="h-4 w-4 mr-1" /> {format(new Date(event.date), 'MMM d, yyyy')}</div>
+                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
+                    <div className="flex items-center"><Calendar className="h-4 w-4 mr-1" /> {format(new Date(event.date), 'MMM d,yyyy')}</div>
                     <div className="flex items-center"><Clock className="h-4 w-4 mr-1" /> {event.time}</div>
                     <div className="flex items-center"><MapPin className="h-4 w-4 mr-1" /> {event.location}</div>
                     <div className="flex items-center"><Users className="h-4 w-4 mr-1" /> {event.currentAttendees}/{event.maxAttendees}</div>
                   </div>
                 </div>
-                <div className="flex gap-2 relative z-20"> {/* Add z-20 here to ensure buttons are clickable */}
-                  <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600" onClick={(e) => e.stopPropagation()}><Eye className="h-5 w-5" /></Link> {/* Prevent bubbling */}
-                  <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600" onClick={(e) => e.stopPropagation()}><Edit className="h-5 w-5" /></Link> {/* Prevent bubbling */}
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }} className="text-gray-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></button> {/* Prevent bubbling */}
+                <div className="flex gap-2 relative z-20 flex-shrink-0 mt-2 sm:mt-0">
+                  <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600" onClick={(e) => e.stopPropagation()}><Eye className="h-5 w-5" /></Link>
+                  <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600" onClick={(e) => e.stopPropagation()}><Edit className="h-5 w-5" /></Link>
+                  <button onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }} className="text-gray-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></button>
                 </div>
               </motion.div>
             ))}
