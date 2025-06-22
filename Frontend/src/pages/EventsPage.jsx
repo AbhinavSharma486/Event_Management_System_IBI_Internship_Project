@@ -75,7 +75,7 @@ const EventsPage = () => {
           <p className="mt-1 text-gray-100">Manage all your events in one place</p>
         </div>
         <Link
-          to="/events/create"
+          to="/create-event"
           className="inline-flex items-center justify-center px-6 py-3 text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg shadow hover:from-purple-700 hover:to-blue-700 transition duration-200 text-sm sm:text-base"
         >
           <Plus className="mr-2 h-5 w-5" />

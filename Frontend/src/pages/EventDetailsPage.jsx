@@ -171,7 +171,13 @@ const EventDetailsPage = () => {
   const BackButton = ({ className = '' }) => (
     <Link
       to="/events"
-      className={`inline-flex items-center justify-center px-6 py-3 border border-transparent text-white font-medium rounded-3xl shadow-sm bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-colors duration-200 ${className}`}
+      className={`inline-flex items-center justify-center 
+      px-4 py-2 text-sm sm:px-6 sm:py-3 sm:text-base 
+      border border-transparent text-white font-medium rounded-3xl shadow-sm 
+      bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-700 hover:to-purple-700 
+      transition-colors duration-200 
+      ${className}
+    `}
     >
       <ArrowLeft className="mr-2 h-5 w-5" />
       Back to Events
