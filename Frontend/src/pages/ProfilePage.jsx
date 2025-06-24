@@ -68,13 +68,14 @@ const ProfilePage = () => {
   ];
 
   return (
-    <div className="px-6 pt-24 pb-16 sm:pt-32 sm:pb-24 lg:px-8 relative z-10  bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200">
+    <div className="space-y-8 min-h-screen px-6 pt-24 pb-16 sm:pt-32 sm:pb-24 lg:px-8 relative z-10  
+bg-gradient-to-tl from-purple-900 via-violet-800 to-slate-900">
 
       <div className="w-full mx-auto space-y-8 px-4 sm:[max-width:640px] md:[max-width:768px] lg:[max-width:1024px]">
         {/* Header */}
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900">Profile Settings</h1>
-          <p className="mt-2 text-base sm:text-lg text-center text-gray-600">
+          <h1 className="text-2xl sm:text-3xl font-bold text-center text-white">Profile Settings</h1>
+          <p className="mt-2 text-base sm:text-lg text-center text-white">
             Manage your account settings and preferences
           </p>
         </div>
