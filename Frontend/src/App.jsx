@@ -10,6 +10,7 @@ import ProfilePage from './pages/ProfilePage';
 import EventsPage from './pages/EventsPage';
 import EventDetailsPage from './pages/EventDetailsPage';
 import CreateEventPage from './pages/CreateEventPage';
+import CalendarPage from "./pages/CalendarPage";
 
 const fadeUpVariants = {
   initial: { opacity: 0, y: 50 },
@@ -30,6 +31,7 @@ function App() {
           <Route path="/events" element={<EventsPage />} />
           <Route path="/events/:id" element={<EventDetailsPage />} />
           <Route path="/create-event" element={<CreateEventPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
         </Routes>
       </div>
       <Footer />
