@@ -25,11 +25,11 @@ const Navbar = () => {
             <Link to="/events" className="text-white hover:text-purple-200 transition-colors duration-200">
               Events
             </Link>
-            <Link to="#testimonials" className="text-white hover:text-purple-200 transition-colors duration-200">
-              Reviews
+            <Link to="/calendar" className="text-white hover:text-purple-200 transition-colors duration-200">
+              Calendar
             </Link>
-            <Link to="#contact" className="text-white hover:text-purple-200 transition-colors duration-200">
-              Contact
+            <Link to="/profile" className="text-white hover:text-purple-200 transition-colors duration-200">
+              Profile
             </Link>
           </div>
 
@@ -85,18 +85,18 @@ const Navbar = () => {
               Events
             </Link>
             <Link
-              to="#testimonials"
+              to="/calendar"
               className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Reviews
+              Calendar
             </Link>
             <Link
-              to="#contact"
+              to="/profile"
               className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Contact
+              Profile
             </Link>
             <Link
               to="/login"
