@@ -5,7 +5,6 @@ import Header from '../components/DashboardPage/Header';
 import DashboardOverview from '../components/DashboardPage/DashboardOverview';
 import EventsGrid from '../components/DashboardPage/EventsGrid';
 import AnalyticsTab from '../components/DashboardPage/AnalyticsTab';
-import CreateEventModal from '../components/DashboardPage/CreateEventModal';
 import EventModal from '../components/DashboardPage/EventModal';
 
 const Dashboard = () => {
@@ -82,7 +81,6 @@ const Dashboard = () => {
         </main>
       </div>
 
-      <CreateEventModal />
       <EventModal />
     </div>
   );

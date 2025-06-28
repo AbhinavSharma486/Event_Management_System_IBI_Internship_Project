@@ -31,21 +31,18 @@ const Navbar = () => {
             <Link to="/profile" className="text-white hover:text-purple-200 transition-colors duration-200">
               Profile
             </Link>
+            <Link to="/dashboard" className="text-white hover:text-purple-200 transition-colors duration-200">
+              Dashboard
+            </Link>
           </div>
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4 font-bold text-xl">
             <Link
               to="/login"
-              className="text-white hover:text-purple-200 transition-colors duration-200"
+              className="bg-white/20 backdrop-blur-2xl text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/30 transition-all duration-200 text-sm sm:text-base"
             >
-              Sign in
-            </Link>
-            <Link
-              to="/register"
-              className="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg hover:bg-white/30 transition-all duration-200 text-sm sm:text-base"
-            >
-              Get Started
+              Sign In
             </Link>
           </div>
 
@@ -99,18 +96,18 @@ const Navbar = () => {
               Profile
             </Link>
             <Link
-              to="/login"
+              to="/dashboard"
               className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Sign in
+              Dashboard
             </Link>
             <Link
-              to="/register"
+              to="/login"
               className="bg-amber-500 backdrop-blur-sm text-black px-6 py-3 rounded-lg hover:bg-white/30 transition-all duration-200 text-2xl font-semibold"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Get Started
+              Sign In
             </Link>
           </motion.div>
         )}

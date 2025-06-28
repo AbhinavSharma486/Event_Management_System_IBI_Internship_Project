@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Menu } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 const Header = ({ activeTab, setIsMobileSidebarOpen }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -31,15 +32,19 @@ const Header = ({ activeTab, setIsMobileSidebarOpen }) => {
         </div>
 
         {/* Right section: Create Event Button */}
-        <motion.button
+        <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
+          className="flex items-center"
         >
-          <Plus className="w-5 h-5" />
-          <span className="hidden sm:inline ml-2">Create Event</span>
-        </motion.button>
+          <Link
+            to="/create-event"
+            className="flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
+          >
+            <Plus className="w-5 h-5" />
+            <span className="hidden sm:inline ml-2">Create Event</span>
+          </Link>
+        </motion.div>
       </div>
     </motion.header>
   );
