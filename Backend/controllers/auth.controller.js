@@ -1,0 +1,51 @@
+import bcryptjs from "bcryptjs";
+import validator from "validator";
+
+import User from "../models/User.model.js";
+
+export const register = async (req, res) => {
+  const { fullName, email, password } = req.body;
+
+  try {
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    // Email format check using validator 
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
+    }
+
+    const userAlreadyExists = await User.findOne({ email });
+
+    if (userAlreadyExists) {
+      return res.status(400).json({ success: false, message: "User already exists" });
+    }
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+
+    const user = new User({
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: {
+        ...user._doc,
+        password: undefined
+      }
+    });
+  } catch (error) {
+    console.log("Error in signup controller", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
