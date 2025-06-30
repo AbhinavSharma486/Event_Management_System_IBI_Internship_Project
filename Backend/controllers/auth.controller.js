@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 import validator from "validator";
 
 import User from "../models/User.model.js";
+import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 
 export const register = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -47,5 +48,42 @@ export const register = async (req, res) => {
   } catch (error) {
     console.log("Error in signup controller", error);
     res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Email format check using validator 
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ success: false, message: "Invalid email format" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "User not found" });
+    }
+
+    const isPasswordCorrect = await bcryptjs.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ success: false, message: "Invalid password" });
+    }
+
+    generateTokenAndSetCookie(res, user._id);
+
+    res.status(200).json({
+      success: true,
+      message: "User logged in successfully",
+      user: {
+        ...user._doc,
+        password: undefined
+      }
+    });
+  } catch (error) {
+    console.log("Error in login controller", error);
+    res.status(400).json({ success: false, message: error.message });
   }
 };
