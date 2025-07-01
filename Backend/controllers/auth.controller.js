@@ -3,6 +3,7 @@ import validator from "validator";
 
 import User from "../models/User.model.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export const register = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -112,6 +113,51 @@ export const checkAuth = async (req, res) => {
     res.status(200).json({ success: true, user });
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { profilePic, fullName, newPassword, confirmNewPassword } = req.body;
+
+    const userId = req.user.id;
+
+    if (!profilePic && !fullName && !newPassword && !confirmNewPassword) {
+      return res.status(400).json({ message: "At least one field is required to update" });
+    }
+
+    let updateData = {};
+
+    if (profilePic) {
+      const uploadResponse = await cloudinary.uploader.upload(profilePic);
+      updateData.profilePic = uploadResponse.secure_url;
+    }
+
+    if (fullName) {
+      updateData.fullName = fullName;
+    }
+
+    if (newPassword || confirmNewPassword) {
+      if (newPassword !== confirmNewPassword) {
+        return res.status(400).json({ message: "Password do not match" });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      const salt = await bcryptjs.genSalt(10);
+      const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+      updateData.password = hashedPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+    res.status(200).json({ updatedUser });
+  } catch (error) {
+    console.log("Error in update profile pic controller", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
