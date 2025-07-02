@@ -141,8 +141,8 @@ export const updateEvent = async (req, res) => {
     };
 
     // prevent empty updates 
-    if(Object.keys(updatedFields).length === 0) {
-      return res.status(400).json({ success: false, message: "No update fields provided"})
+    if (Object.keys(updatedFields).length === 0) {
+      return res.status(400).json({ success: false, message: "No update fields provided" });
     }
 
     // update and populate event
@@ -157,6 +157,44 @@ export const updateEvent = async (req, res) => {
     });
   } catch (error) {
     console.error('Error in update event controller', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const deleteEvent = async (req, res) => {
+  try {
+    // fetch the event by id 
+    const event = await Event.findById(req.params.eventId);
+
+    // check if the event exists 
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // check if the logged in user is the creator 
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to delete this event" });
+    }
+
+    // delete the event from db 
+    await Event.findByIdAndDelete(req.params.eventId);
+
+    // remove refrence from creator & attendees
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { createdEvents: req.params.eventId }
+    });
+
+    await User.updateMany(
+      { attendingEvents: req.params.eventId },
+      { $pull: { attendingEvents: req.params.eventId } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Event deleted successfully"
+    });
+  } catch (error) {
+    console.error('Error in delete event controller', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
