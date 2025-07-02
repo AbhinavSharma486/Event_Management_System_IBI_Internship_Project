@@ -319,3 +319,60 @@ export const leaveEvent = async (req, res) => {
     return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+
+export const removeAttendee = async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+    const userId = req.params.userId;
+
+    // validate params
+    if (!eventId || !userId) {
+      return res.status(400).json({ success: false, message: "Event Id & User Id are required" });
+    }
+
+    // fetch the event 
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // only the creator can remove attendees 
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to remove attendees" });
+    }
+
+    // check if user is actually an attendee 
+    const isAttending = event.attendees.some(
+      attendeeId => attendeeId.toString() === userId
+    );
+
+    if (!isAttending) {
+      return res.status(400).json({ success: false, message: "User is not an attendee of this event" });
+    }
+
+    // remove the user from event attendees list
+    event.attendees = event.attendees.filter(
+      attendeeId => attendeeId.toString() !== userId
+    );
+
+    await event.save();
+
+    // remove the event from user's eventAttendees list 
+    await User.findByIdAndUpdate(userId, {
+      $pull: { eventAttendees: event._id }
+    });
+
+    // get updated event with populated fields 
+    const updatedEvent = await Event.findById(eventId).populate(populateFields);
+
+    return res.status(200).json({
+      success: true,
+      message: "User successfully removed from event",
+      event: updatedEvent
+    });
+  } catch (error) {
+    console.error("Error in removeAttendee controller", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};

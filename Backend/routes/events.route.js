@@ -1,6 +1,6 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { addAttendeToEvent, createEvent, deleteEvent, leaveEvent, updateEvent } from "../controllers/event.controller.js";
+import { addAttendeToEvent, createEvent, deleteEvent, leaveEvent, removeAttendee, updateEvent } from "../controllers/event.controller.js";
 
 const router = express.Router();
 
@@ -13,5 +13,7 @@ router.delete("/deleteEvent/:eventId", protectRoute, deleteEvent);
 router.post("/addAttendeeToEvent/:eventId", protectRoute, addAttendeToEvent);
 
 router.post("/leaveEvent/:eventId", protectRoute, leaveEvent);
+
+router.delete("/:eventId/removeAttendee/:userId", protectRoute, removeAttendee);
 
 export default router;
