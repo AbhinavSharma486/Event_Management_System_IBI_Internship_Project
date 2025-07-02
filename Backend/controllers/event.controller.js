@@ -198,3 +198,73 @@ export const deleteEvent = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+export const addAttendeToEvent = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // validate email
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Attendee email is required" });
+    }
+
+    // find event 
+    const event = await Event.findById(req.params.eventId);
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // only the creator can add attendees 
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to add attendees" });
+    }
+
+    // find attendee by email
+    const attendeeUser = await User.findOne({ email });
+
+    if (!attendeeUser) {
+      return res.status(404).json({ success: false, message: "User with this email not found" });
+    }
+
+    // Prevent creator from adding themselves
+    if (attendeeUser._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({ success: false, message: 'You cannot add yourself as an attendee to your own event' });
+    }
+
+    // check if the user is already an attendee
+    const isAttending = event.attendees.some(
+      attendee => attendee.user.toString() === attendeeUser._id.toString()
+    );
+
+    if (isAttending) {
+      return res.status(400).json({ success: false, message: "User is already attending this event" });
+    }
+
+    // check if event is full 
+    if (event.maxAttendees && event.attendees.length >= event.maxAttendees) {
+      return res.status(400).json({ success: false, message: "Event is full" });
+    }
+
+    // add attendee to event
+    event.attendees.push(attendeeUser._id);
+
+    await event.save();
+
+    // add event to user's attending list 
+    await User.findByIdAndUpdate(attendeeUser._id, {
+      $addToSet: { eventAttendees: event._id }
+    });
+
+    const updatedEvent = await Event.findById(event._id).populate(populateFields);
+
+    return res.status(200).json({
+      success: true,
+      message: `User ${email} successfully added to event`,
+      event: updatedEvent
+    });
+  } catch (error) {
+    console.error('Error in add attendee to event controller', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
