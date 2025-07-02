@@ -1,8 +1,13 @@
 import validator from "validator";
-import User from "../models/User.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import User from "../models/User.model.js";
 import Event from '../models/Event.model.js';
 
+// Define commonly used populate configuration for cleaner code reuse
+const populateFields = [
+  { path: 'creator', select: 'name email' },
+  { path: 'attendees.user', select: 'name email' }
+];
 
 export const createEvent = async (req, res) => {
 
@@ -76,5 +81,82 @@ export const createEvent = async (req, res) => {
   } catch (error) {
     console.log("Error in create event controller", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const updateEvent = async (req, res) => {
+  const { title, description, date, time, location, maxAttendees, image, banner1, banner2 } = req.body;
+
+  try {
+    // Fetch the event to update
+    const event = await Event.findById(req.params.eventId);
+    console.log(event);
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // check permission : only the creator can update the event
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not Authorized to update this event" });
+    }
+
+    // Validate fields only if they are provided
+    if (date && !validator.isISO8601(date)) {
+      return res.staus(400).json({ success: false, message: "Invalid date format" });
+    }
+
+    if (date && new Date(date) < new Date()) {
+      return res.status(400).json({ success: false, message: 'Event date must be in the future' });
+    }
+
+    if (maxAttendees && isNaN(maxAttendees)) {
+      return res.status(400).json({ success: false, message: "Max Attendees must be a number" });
+    }
+
+    // Helper function for image upload
+    const uploadImage = async (base64Image, name) => {
+      if (!base64Image) return null; // only upload if new image is provided
+
+      const uploaded = await cloudinary.uploader.upload(base64Image);
+      return uploaded.secure_url;
+    };
+
+    // Upload new images if provided
+    const uploadedImage = image ? await uploadImage(image, "Image") : null;
+    const uploadedBanner1 = banner1 ? await uploadImage(banner1, "Banner1") : null;
+    const uploadedBanner2 = banner2 ? await uploadImage(banner2, "Banner2") : null;
+
+    // Prepare updated fields 
+    const updatedFields = {
+      ...(title && { title }),
+      ...(description && { description }),
+      ...(date && { date }),
+      ...(time && { time }),
+      ...(location && { location }),
+      ...(uploadedImage && { image: uploadedImage }),
+      ...(uploadedBanner1 && { banner1: uploadedBanner1 }),
+      ...(uploadedBanner2 && { banner2: uploadedBanner2 }),
+      ...(maxAttendees !== undefined && { maxAttendees: parseInt(maxAttendees, 10) })
+    };
+
+    // prevent empty updates 
+    if(Object.keys(updatedFields).length === 0) {
+      return res.status(400).json({ success: false, message: "No update fields provided"})
+    }
+
+    // update and populate event
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.eventId, updatedFields, {
+      new: true
+    }).populate(populateFields);
+
+    return res.status(200).json({
+      success: true,
+      message: "Event updated successfully",
+      event: updatedEvent
+    });
+  } catch (error) {
+    console.error('Error in update event controller', error);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
