@@ -268,3 +268,54 @@ export const addAttendeToEvent = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+export const leaveEvent = async (req, res) => {
+  try {
+    const eventId = req.params.eventId;
+
+    // validate the event id 
+    if (!eventId) {
+      return res.status(400).json({ success: false, message: "Event Id is required" });
+    }
+
+    // find the event 
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // check if the user is an attendee
+    const isAttending = event.attendees.some(
+      attendeeId => attendeeId.toString() === req.user._id.toString()
+    );
+
+    if (!isAttending) {
+      return res.status(400).json({ success: false, message: "You are not attending this event" });
+    }
+
+    // remove user from attendees list 
+    event.attendees = event.attendees.filter(
+      attendeeId => attendeeId.toString() !== req.user._id.toString()
+    );
+
+    await event.save();
+
+    // remove event from user's attendingEvents list
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { eventAttendees: event._id }
+    });
+
+    // get updated event with populated fields 
+    const updatedEvent = await Event.findById(eventId).populate(populateFields);
+
+    return res.status(200).json({
+      success: false,
+      message: "You have successfully left the event",
+      event: updatedEvent
+    });
+  } catch (error) {
+    console.error("Error in leaveEvent controller", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
