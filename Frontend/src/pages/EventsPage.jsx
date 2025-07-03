@@ -15,7 +15,7 @@ import {
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
-import EventCard from '../components/DashboardPage/EventCard';
+import EventCard from '../components/Events/EventCard';
 
 const initialEvents = [
   {

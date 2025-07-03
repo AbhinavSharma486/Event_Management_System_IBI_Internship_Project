@@ -31,9 +31,6 @@ const Navbar = () => {
             <Link to="/profile" className="text-white hover:text-purple-200 transition-colors duration-200">
               Profile
             </Link>
-            <Link to="/dashboard" className="text-white hover:text-purple-200 transition-colors duration-200">
-              Dashboard
-            </Link>
           </div>
 
           {/* Auth Buttons */}
@@ -94,13 +91,6 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Profile
-            </Link>
-            <Link
-              to="/dashboard"
-              className="text-black text-2xl font-semibold hover:text-purple-200 transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Dashboard
             </Link>
             <Link
               to="/login"
