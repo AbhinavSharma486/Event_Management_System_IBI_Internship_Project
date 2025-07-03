@@ -9,6 +9,8 @@ const populateFields = [
   { path: 'attendees.user', select: 'name email' }
 ];
 
+
+/* Create a new event */
 export const createEvent = async (req, res) => {
 
   const { title, description, date, time, location, maxAttendees, image, banner1, banner2 } = req.body;
@@ -84,6 +86,8 @@ export const createEvent = async (req, res) => {
   }
 };
 
+
+/* Update an existing event */
 export const updateEvent = async (req, res) => {
   const { title, description, date, time, location, maxAttendees, image, banner1, banner2 } = req.body;
 
@@ -161,6 +165,8 @@ export const updateEvent = async (req, res) => {
   }
 };
 
+
+/* delete an event */
 export const deleteEvent = async (req, res) => {
   try {
     // fetch the event by id 
@@ -199,6 +205,8 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
+
+/* add attendee to an event */
 export const addAttendeToEvent = async (req, res) => {
   const { email } = req.body;
 
@@ -269,6 +277,8 @@ export const addAttendeToEvent = async (req, res) => {
   }
 };
 
+
+/* leave an event */
 export const leaveEvent = async (req, res) => {
   try {
     const eventId = req.params.eventId;
@@ -320,6 +330,8 @@ export const leaveEvent = async (req, res) => {
   }
 };
 
+
+/* remove a specific attendee (only by event creator) */
 export const removeAttendee = async (req, res) => {
   try {
     const eventId = req.params.eventId;
@@ -374,5 +386,37 @@ export const removeAttendee = async (req, res) => {
   } catch (error) {
     console.error("Error in removeAttendee controller", error);
     return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+
+/* Get all events created by the current logged in user */
+export const getMyEvents = async (req, res) => {
+  try {
+    // fetch only events created by the logged in user 
+    const events = await Event.find({ creator: req.user._id }).populate(populateFields).sort({ date: 1 });
+
+    // check if any events found 
+    if (!events || events.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No events found for the current user",
+        events: []
+      });
+    }
+
+    // return the events 
+    return res.status(200).json({
+      sucess: true,
+      message: "Events fetch successfully",
+      events
+    });
+
+  } catch (error) {
+    console.error("Error in getMyEvents controller:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
   }
 };
