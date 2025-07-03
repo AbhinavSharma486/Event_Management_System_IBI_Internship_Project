@@ -1,10 +1,12 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { addAttendeToEvent, createEvent, deleteEvent, getMyEvents, leaveEvent, removeAttendee, updateEvent } from "../controllers/event.controller.js";
+import { addAttendeToEvent, createEvent, deleteEvent, getMyEvents, getSingleEvent, leaveEvent, removeAttendee, updateEvent } from "../controllers/event.controller.js";
 
 const router = express.Router();
 
 router.get("/my-events", protectRoute, getMyEvents);
+
+router.get("/getSingleEvent/:eventId", protectRoute, getSingleEvent);
 
 router.post("/create-event", protectRoute, createEvent);
 

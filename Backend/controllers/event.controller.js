@@ -420,3 +420,37 @@ export const getMyEvents = async (req, res) => {
     });
   }
 };
+
+
+/* Get a single event by its ID */
+export const getSingleEvent = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    // validate eventId
+    if (!eventId) {
+      return res.status(400).json({ success: false, message: "Event Id is required" });
+    }
+
+    // fetch event from database with populated fields 
+    const event = await Event.findById(eventId).populate(populateFields);
+
+    // if event not found
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // return event details 
+    return res.status(200).json({
+      success: true,
+      message: "Single Event details fetched successfully",
+      event
+    });
+  } catch (error) {
+    console.error("Error in getEventById controller", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};
