@@ -13,10 +13,8 @@ import {
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'events', label: 'Events', icon: Calendar },
     { id: 'attendees', label: 'Attendees', icon: Users },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -56,8 +54,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             whileTap={{ scale: 0.98 }}
             onClick={() => setActiveTab(item.id)}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${activeTab === item.id
-                ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                : 'text-gray-600 hover:bg-gray-100'
+              ? 'bg-purple-100 text-purple-700 border border-purple-200'
+              : 'text-gray-600 hover:bg-gray-100'
               }`}
           >
             <item.icon className="w-5 h-5" />

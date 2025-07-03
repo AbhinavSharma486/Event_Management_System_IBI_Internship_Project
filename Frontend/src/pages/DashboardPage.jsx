@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Sidebar from '../components/DashboardPage/Sidebar';
 import Header from '../components/DashboardPage/Header';
 import DashboardOverview from '../components/DashboardPage/DashboardOverview';
-import EventsGrid from '../components/DashboardPage/EventsGrid';
 import AnalyticsTab from '../components/DashboardPage/AnalyticsTab';
 import EventModal from '../components/DashboardPage/EventModal';
 
@@ -15,8 +14,6 @@ const Dashboard = () => {
     switch (activeTab) {
       case 'dashboard':
         return <DashboardOverview />;
-      case 'events':
-        return <EventsGrid />;
       case 'analytics':
         return <AnalyticsTab />;
       case 'attendees':

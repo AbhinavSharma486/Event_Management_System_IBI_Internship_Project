@@ -15,6 +15,8 @@ import {
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
+import EventCard from '../components/DashboardPage/EventCard';
+
 const initialEvents = [
   {
     id: '1',
@@ -23,10 +25,9 @@ const initialEvents = [
     location: 'Online',
     date: '2025-07-01',
     time: '10:00 AM',
-    status: 'published',
     image: 'https://images.pexels.com/photos/573589/pexels-photo-573589.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    currentAttendees: 120,
-    maxAttendees: 200,
+    attendees: 120,
+    capacity: 200,
   },
   {
     id: '2',
@@ -35,17 +36,15 @@ const initialEvents = [
     location: 'Bangalore',
     date: '2025-07-15',
     time: '2:00 PM',
-    status: 'draft',
     image: 'https://images.pexels.com/photos/716411/pexels-photo-716411.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    currentAttendees: 45,
-    maxAttendees: 100,
+    attendees: 45,
+    capacity: 100,
   },
 ];
 
 const EventsPage = () => {
   const [events, setEvents] = useState(initialEvents);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
 
   const filteredEvents = events.filter((event) => {
@@ -54,13 +53,14 @@ const EventsPage = () => {
       event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.location.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesFilter = filterStatus === 'all' || event.status === filterStatus;
-
-    return matchesSearch && matchesFilter;
+    return matchesSearch;
   });
 
   const handleDeleteEvent = (eventId, eventTitle) => {
-    if (window.confirm(`Are you sure you want to delete "${eventTitle}"?`)) {
+    const eventToDelete = events.find(event => event.id === eventId);
+    const title = eventTitle || eventToDelete?.title || 'this event';
+
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
       setEvents((prev) => prev.filter((event) => event.id !== eventId));
       toast.success('Event deleted successfully');
     }
@@ -127,8 +127,8 @@ const EventsPage = () => {
             <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
             <p className="text-gray-500 mb-6">
-              {searchTerm || filterStatus !== 'all'
-                ? 'Try adjusting your search or filter criteria'
+              {searchTerm
+                ? 'Try adjusting your search criteria'
                 : 'Get started by creating your first event'}
             </p>
             <Link
@@ -142,50 +142,18 @@ const EventsPage = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredEvents.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-white rounded-xl shadow-lg hover:shadow-xl overflow-hidden cursor-pointer relative"
-              >
-                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link>
-                {event.image && (
-                  <img src={event.image} alt={event.title} className="w-full h-48 object-cover" />
-                )}
-                <div className="p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${event.status === 'published' ? 'bg-green-100 text-green-800' : event.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{event.status}</span>
-                    <div className="flex gap-1">
-                      <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600 relative z-20">
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                      <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600 relative z-20">
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      <button onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }} className="text-gray-400 hover:text-red-600 relative z-20">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 truncate mb-1">{event.title}</h3>
-                  <p className="text-sm text-gray-600 mb-3 truncate">{event.description}</p>
-                  <div className="text-sm text-gray-500 space-y-1">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" /> {format(new Date(event.date), 'MMM d,yyyy')}
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-2" /> {event.time}
-                    </div>
-                    <div className="flex items-center">
-                      <MapPin className="h-4 w-4 mr-2" /> {event.location}
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" /> {event.currentAttendees}/{event.maxAttendees}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+              <div key={event.id} className="relative">
+                <Link
+                  to={`/events/${event.id}`}
+                  className="absolute inset-0 z-10"
+                  aria-label={`View details for ${event.title}`}
+                />
+                <EventCard
+                  index={index}
+                  event={event}
+                  handleDeleteEvent={(id) => handleDeleteEvent(id, event.title)}
+                />
+              </div>
             ))}
           </div>
         ) : (
@@ -205,20 +173,43 @@ const EventsPage = () => {
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2 sm:gap-0">
                     <h3 className="text-lg font-medium text-gray-900 truncate flex-grow">{event.title}</h3>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${event.status === 'published' ? 'bg-green-100 text-green-800' : event.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'} flex-shrink-0`}>{event.status}</span>
                   </div>
                   <p className="text-sm text-gray-600 truncate mb-2">{event.description}</p>
                   <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
                     <div className="flex items-center"><Calendar className="h-4 w-4 mr-1" /> {format(new Date(event.date), 'MMM d,yyyy')}</div>
                     <div className="flex items-center"><Clock className="h-4 w-4 mr-1" /> {event.time}</div>
                     <div className="flex items-center"><MapPin className="h-4 w-4 mr-1" /> {event.location}</div>
-                    <div className="flex items-center"><Users className="h-4 w-4 mr-1" /> {event.currentAttendees}/{event.maxAttendees}</div>
+                    <div className="flex items-center"><Users className="h-4 w-4 mr-1" /> {event.attendees}/{event.capacity}</div>
                   </div>
                 </div>
-                <div className="flex gap-2 relative z-20 flex-shrink-0 mt-2 sm:mt-0">
-                  <Link to={`/events/${event.id}`} className="text-gray-400 hover:text-purple-600" onClick={(e) => e.stopPropagation()}><Eye className="h-5 w-5" /></Link>
-                  <Link to={`/events/${event.id}/edit`} className="text-gray-400 hover:text-blue-600" onClick={(e) => e.stopPropagation()}><Edit className="h-5 w-5" /></Link>
-                  <button onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }} className="text-gray-400 hover:text-red-600"><Trash2 className="h-5 w-5" /></button>
+                <div className="flex gap-1 relative z-20 flex-shrink-0 mt-2 sm:mt-0">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label="View event"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm"
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label="Edit event"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }}
+                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
+                    aria-label="Delete event"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </motion.button>
                 </div>
               </motion.div>
             ))}
