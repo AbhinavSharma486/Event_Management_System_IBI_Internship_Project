@@ -57,14 +57,14 @@ const HeroSection = () => {
       >
         <div className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full text-white mb-6 sm:mb-8">
           <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-          <span className="text-xs sm:text-sm font-medium">New: AI-powered event recommendations</span>
+          <span className="text-xs sm:text-sm font-medium">Create Events with Ease and Efficiency</span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 sm:mb-8 leading-tight">
-          Create Amazing
-          <span className="block bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
+          Create Amazing{" "}
+          <span className="bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
             Events
-          </span>
+          </span>{" "}
           Effortlessly
         </h1>
 
@@ -81,10 +81,6 @@ const HeroSection = () => {
             Start Free Trial
             <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
-          <button className="group inline-flex items-center px-6 py-3 sm:px-8 sm:py-4 text-base sm:text-lg font-semibold text-white border-2 border-white/30 rounded-xl hover:bg-white/10 transition-all duration-200">
-            <Play className="mr-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform" />
-            Watch Demo
-          </button>
         </div>
 
         {/* Hero Stats */}
