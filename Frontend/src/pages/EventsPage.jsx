@@ -67,7 +67,7 @@ const EventsPage = () => {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-t from-yellow-900 via-pink-900 to-indigo-900 min-h-screen pt-30 pb-10 px-4 sm:px-6 lg:px-8">
+    <div className="space-y-8 bg-gradient-to-tr from-green-400 via-teal-500 to-blue-700 min-h-screen pt-30 pb-10 px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
