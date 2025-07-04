@@ -46,12 +46,6 @@ const LoginPage = () => {
         >
           {/* Moved Header inside the form card */}
           <div className="text-center mb-6">
-            <Link to="/" className="inline-flex items-center justify-center mb-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
-                <Calendar className="h-7 w-7 text-white" />
-              </div>
-              <span className="ml-3 text-2xl font-bold text-gray-900">EventFlow</span>
-            </Link>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back
             </h2>
