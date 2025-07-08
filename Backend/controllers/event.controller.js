@@ -393,7 +393,7 @@ export const removeAttendee = async (req, res) => {
 export const getMyEvents = async (req, res) => {
   try {
     // fetch only events created by the logged in user 
-    const events = await Event.find({ creator: req.user._id }).populate(populateFields).sort({ date: 1 });
+    const events = await Event.find({ creator: req.user._id }).populate(populateFields).sort({ date: 1 }).lean();
 
     // check if any events found 
     if (!events || events.length === 0) {
