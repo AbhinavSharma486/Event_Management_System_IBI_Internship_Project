@@ -124,11 +124,11 @@ export const checkAuth = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic, fullName, newPassword, confirmNewPassword } = req.body;
+    const { profilePic, fullName, newPassword, confirmNewPassword, mobileNumber } = req.body;
 
-    const userId = req.user.id;
+    const userId = req.user._id;
 
-    if (!profilePic && !fullName && !newPassword && !confirmNewPassword) {
+    if (!profilePic && !fullName && !newPassword && !confirmNewPassword && !mobileNumber) {
       return res.status(400).json({ message: "At least one field is required to update" });
     }
 
@@ -141,6 +141,21 @@ export const updateProfile = async (req, res) => {
 
     if (fullName) {
       updateData.fullName = fullName;
+    }
+
+    if (mobileNumber) {
+      if (!/^[6-9]\d{9}$/.test(mobileNumber)) {
+        return res.status(400).json({ message: "Enter a valid 10 digit Indian mobile number" });
+      }
+
+      // check if mobile number is alraedy used by another user
+      const existingUser = await User.findOne({ mobileNumber, _id: { $ne: userId } });
+
+      if (existingUser) {
+        return res.status(400).json({ message: "This mobile number is already in use by another account." });
+      }
+
+      updateData.mobileNumber = mobileNumber;
     }
 
     if (newPassword || confirmNewPassword) {
@@ -158,7 +173,7 @@ export const updateProfile = async (req, res) => {
       updateData.password = hashedPassword;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).lean().exec();
 
     res.status(200).json({ updatedUser });
   } catch (error) {
