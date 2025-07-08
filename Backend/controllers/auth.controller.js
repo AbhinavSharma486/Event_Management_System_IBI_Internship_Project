@@ -68,7 +68,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid email format" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).lean().exec();
 
     if (!user) {
       return res.status(400).json({ success: false, message: "User not found" });
