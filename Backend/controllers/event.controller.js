@@ -476,3 +476,33 @@ export const getAttendingEvents = async (req, res) => {
     });
   }
 };
+
+
+/* Get all events for calendar view (created + attending events) */
+export const getAllEventsForCalendar = async (req, res) => {
+  try {
+    // fetch events created by the user
+    const createdEvents = await Event.find({ creator: req.user._id }).populate(populateFields).lean();
+
+    // fetch events where the user is an attendee (but no the creator)
+    const attendingEvents = await Event.find({
+      attendees: req.user._id,
+      creator: { $ne: req.user._id }
+    }).populate(populateFields).lean();
+
+    // combine both arrays and sort by date 
+    const allEvents = [...createdEvents, ...attendingEvents].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    return res.status(200).json({
+      success: true,
+      message: "Calendar events fetched successfully",
+      events: allEvents
+    });
+  } catch (error) {
+    console.error("Error in getAllEventsForCalendar controller:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+};

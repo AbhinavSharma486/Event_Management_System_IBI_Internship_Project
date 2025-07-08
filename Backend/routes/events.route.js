@@ -1,6 +1,6 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
-import { addAttendeToEvent, createEvent, deleteEvent, getAttendingEvents, getMyEvents, getSingleEvent, leaveEvent, removeAttendee, updateEvent } from "../controllers/event.controller.js";
+import { addAttendeToEvent, createEvent, deleteEvent, getAllEventsForCalendar, getAttendingEvents, getMyEvents, getSingleEvent, leaveEvent, removeAttendee, updateEvent } from "../controllers/event.controller.js";
 
 const router = express.Router();
 
@@ -21,5 +21,7 @@ router.post("/leaveEvent/:eventId", protectRoute, leaveEvent);
 router.delete("/:eventId/removeAttendee/:userId", protectRoute, removeAttendee);
 
 router.get("/attending-events", protectRoute, getAttendingEvents);
+
+router.get("/calendar-events", protectRoute, getAllEventsForCalendar);
 
 export default router;
