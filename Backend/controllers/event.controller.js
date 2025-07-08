@@ -228,7 +228,7 @@ export const addAttendeToEvent = async (req, res) => {
     }
 
     // find attendee by email
-    const attendeeUser = await User.findOne({ email });
+    const attendeeUser = await User.findOne({ email }).lean();
 
     if (!attendeeUser) {
       return res.status(404).json({ success: false, message: "User with this email not found" });
@@ -241,7 +241,7 @@ export const addAttendeToEvent = async (req, res) => {
 
     // check if the user is already an attendee
     const isAttending = event.attendees.some(
-      attendee => attendee.user.toString() === attendeeUser._id.toString()
+      attendeeId => attendeeId.toString() === attendeeUser._id.toString()
     );
 
     if (isAttending) {
@@ -263,7 +263,7 @@ export const addAttendeToEvent = async (req, res) => {
       $addToSet: { eventAttendees: event._id }
     });
 
-    const updatedEvent = await Event.findById(event._id).populate(populateFields);
+    const updatedEvent = await Event.findById(event._id).populate(populateFields).lean();
 
     return res.status(200).json({
       success: true,
