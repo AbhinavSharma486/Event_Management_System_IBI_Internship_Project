@@ -342,7 +342,7 @@ export const removeAttendee = async (req, res) => {
     }
 
     // fetch the event 
-    const event = await Event.findById(eventId);
+    const event = await Event.findById(eventId).lean();
 
     if (!event) {
       return res.status(404).json({ success: false, message: "Event not found" });
@@ -375,7 +375,7 @@ export const removeAttendee = async (req, res) => {
     });
 
     // get updated event with populated fields 
-    const updatedEvent = await Event.findById(eventId).populate(populateFields);
+    const updatedEvent = await Event.findById(eventId).populate(populateFields).lean();
 
     return res.status(200).json({
       success: true,
