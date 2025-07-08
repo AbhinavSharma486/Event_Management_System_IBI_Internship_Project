@@ -5,8 +5,8 @@ import Event from '../models/Event.model.js';
 
 // Define commonly used populate configuration for cleaner code reuse
 const populateFields = [
-  { path: 'creator', select: 'name email' },
-  { path: 'attendees.user', select: 'name email' }
+  { path: 'creator', select: 'fullName email mobileNumber' },
+  { path: 'attendees', select: 'FullName email' }
 ];
 
 
@@ -93,8 +93,7 @@ export const updateEvent = async (req, res) => {
 
   try {
     // Fetch the event to update
-    const event = await Event.findById(req.params.eventId);
-    console.log(event);
+    const event = await Event.findById(req.params.eventId).lean();
 
     if (!event) {
       return res.status(404).json({ success: false, message: "Event not found" });
@@ -152,7 +151,7 @@ export const updateEvent = async (req, res) => {
     // update and populate event
     const updatedEvent = await Event.findByIdAndUpdate(req.params.eventId, updatedFields, {
       new: true
-    }).populate(populateFields);
+    }).populate(populateFields).lean();
 
     return res.status(200).json({
       success: true,
