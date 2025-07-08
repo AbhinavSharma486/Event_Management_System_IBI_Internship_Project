@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 import validator from "validator";
 
 import User from "../models/User.model.js";
+import Event from "../models/Event.model.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import cloudinary from "../lib/cloudinary.js";
 
@@ -184,9 +185,26 @@ export const updateProfile = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.userId);
+    const userId = req.params.userId;
 
-    res.status(200).json({ message: "User deleted successfully" });
+    // only allow the logged in user to delete their own account 
+    if (req.user._id.toString() !== userId) {
+      return res.status(403).json({ message: "Not authorized to delete this account" });
+    }
+
+    // 1. Delete all events created by this usr 
+    await Event.deleteMany({ creator: userId });
+
+    // 2. Remove this user from all attendees arrays 
+    await Event.updateMany(
+      { attendees: userId },
+      { $pull: { attendees: userId } }
+    );
+
+    // 3. Delete the user account
+    await User.findByIdAndDelete(userId).lean().exec();
+
+    res.status(200).json({ message: "User and all realted data deleted successfully" });
   } catch (error) {
     console.log("Error in delete user controller", error);
     res.status(500).json({ message: "Internal server error" });
