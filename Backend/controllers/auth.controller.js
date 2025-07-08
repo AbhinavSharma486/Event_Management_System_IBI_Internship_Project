@@ -6,10 +6,10 @@ import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js
 import cloudinary from "../lib/cloudinary.js";
 
 export const register = async (req, res) => {
-  const { fullName, email, password } = req.body;
+  const { fullName, email, password, mobileNumber } = req.body;
 
   try {
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || !mobileNumber) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
@@ -22,7 +22,11 @@ export const register = async (req, res) => {
       return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
     }
 
-    const userAlreadyExists = await User.findOne({ email });
+    if (!/^\d{10,15}$/.test(mobileNumber)) {
+      return res.status(400).json({ success: false, message: "Invalid mobile number format" });
+    }
+
+    const userAlreadyExists = await User.findOne({ email }).lean().exec();
 
     if (userAlreadyExists) {
       return res.status(400).json({ success: false, message: "User already exists" });
@@ -34,6 +38,7 @@ export const register = async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
+      mobileNumber
     });
 
     generateTokenAndSetCookie(res, user._id);
