@@ -169,7 +169,7 @@ export const updateEvent = async (req, res) => {
 export const deleteEvent = async (req, res) => {
   try {
     // fetch the event by id 
-    const event = await Event.findById(req.params.eventId);
+    const event = await Event.findById(req.params.eventId).lean();
 
     // check if the event exists 
     if (!event) {
