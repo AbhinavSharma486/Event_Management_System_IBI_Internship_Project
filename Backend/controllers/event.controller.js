@@ -432,7 +432,7 @@ export const getSingleEvent = async (req, res) => {
     }
 
     // fetch event from database with populated fields 
-    const event = await Event.findById(eventId).populate(populateFields);
+    const event = await Event.findById(eventId).populate(populateFields).lean();
 
     // if event not found
     if (!event) {
