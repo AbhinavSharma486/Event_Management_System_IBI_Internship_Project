@@ -453,3 +453,26 @@ export const getSingleEvent = async (req, res) => {
     });
   }
 };
+
+
+/* Get all attending events */
+export const getAttendingEvents = async (req, res) => {
+  try {
+    // fetch events where the user is an attendee but not the creator 
+    const events = await Event.find({
+      attendees: req.user._id,
+      creator: { $ne: req.user._id }
+    }).populate(populateFields).sort({ date: 1 }).lean();
+
+    return res.status(200).json({
+      success: true,
+      message: "Attending events fetched successfully",
+      events
+    });
+  } catch (error) {
+    console.error("Error in getAttendingEvents controller:", error);
+    return res.status(500).json({
+      success: false, message: "Internal server error"
+    });
+  }
+};
