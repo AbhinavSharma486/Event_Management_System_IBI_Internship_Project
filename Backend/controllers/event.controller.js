@@ -316,7 +316,7 @@ export const leaveEvent = async (req, res) => {
     });
 
     // get updated event with populated fields 
-    const updatedEvent = await Event.findById(eventId).populate(populateFields);
+    const updatedEvent = await Event.findById(eventId).populate(populateFields).lean();
 
     return res.status(200).json({
       success: false,
