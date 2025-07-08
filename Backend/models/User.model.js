@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6
     },
+    mobileNumber: {
+      type: String,
+      required: true,
+      trim: true
+    },
     profilePic: {
       type: String,
       default: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
