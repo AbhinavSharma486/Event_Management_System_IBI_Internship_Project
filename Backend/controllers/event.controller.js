@@ -219,12 +219,12 @@ export const deleteEvent = async (req, res) => {
 
 /* add attendee to an event */
 export const addAttendeToEvent = async (req, res) => {
-  const { email } = req.body;
+  const { email, mobileNumber } = req.body;
 
   try {
     // validate email
-    if (!email) {
-      return res.status(400).json({ success: false, message: "Attendee email is required" });
+    if (!email && !mobileNumber) {
+      return res.status(400).json({ success: false, message: "Attendee email or mobile number is required" });
     }
 
     // find event 
@@ -239,8 +239,15 @@ export const addAttendeToEvent = async (req, res) => {
       return res.status(403).json({ success: false, message: "Not authorized to add attendees" });
     }
 
-    // find attendee by email
-    const attendeeUser = await User.findOne({ email }).lean();
+    // find attendee by email or mobile number
+    const attendeeUser = null;
+
+    if (email) {
+      attendeeUser = await User.findOne({ email }).lean();
+    }
+    else if (mobileNumber) {
+      attendeeUser = await User.findOne({ mobileNumber }).lean();
+    }
 
     if (!attendeeUser) {
       return res.status(404).json({ success: false, message: "User with this email not found" });
