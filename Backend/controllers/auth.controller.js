@@ -23,14 +23,23 @@ export const register = async (req, res) => {
       return res.status(400).json({ success: false, message: "Password must be at least 6 characters long" });
     }
 
+    // Add mobile number validation 
     if (!/^\d{10,15}$/.test(mobileNumber)) {
       return res.status(400).json({ success: false, message: "Invalid mobile number format" });
     }
 
+    // check if email already exists 
     const userAlreadyExists = await User.findOne({ email }).lean().exec();
 
     if (userAlreadyExists) {
       return res.status(400).json({ success: false, message: "User already exists" });
+    }
+
+    // check if mobile number already exists 
+    const userWithMobile = await User.findOne({ mobileNumber }).lean().exec();
+
+    if (userWithMobile) {
+      return res.status(400).json({ success: false, message: "Mobile number is already registered with another account" });
     }
 
     const hashedPassword = await bcryptjs.hash(password, 10);
