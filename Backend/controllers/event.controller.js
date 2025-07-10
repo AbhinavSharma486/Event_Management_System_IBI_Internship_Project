@@ -117,6 +117,18 @@ export const updateEvent = async (req, res) => {
       return res.status(400).json({ success: false, message: "Max Attendees must be a number" });
     }
 
+    // Prevent reducing maxAttendees below current attendees count
+    if (maxAttendees !== undefined) {
+      const newMax = parseInt(maxAttendees, 10);
+
+      if (event.attendees && event.attendees.length > newMax) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannnot set max attendees less than current number of attendees."
+        });
+      }
+    }
+
     // Helper function for image upload
     const uploadImage = async (base64Image, name) => {
       if (!base64Image) return null; // only upload if new image is provided
