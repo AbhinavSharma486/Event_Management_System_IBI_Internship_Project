@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import { Routes, Route } from "react-router-dom";
-import LandingPage from './pages/LandingPage';
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "./components/Navbar";
+import LandingPage from './pages/LandingPage';
 import Footer from './components/Footer';
+
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';

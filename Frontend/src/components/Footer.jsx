@@ -1,77 +1,74 @@
 import React from 'react';
-import { Calendar, Linkedin, Mail } from 'lucide-react';
+import { Calendar, Linkedin, Mail, Instagram, Twitter } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer id="contact" className="bg-gray-900 text-white p-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          {/* Company Info */}
-          <div>
-            <div className="flex items-center mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-white" />
+    <footer className="bg-gradient-to-r from-[#22223b] via-[#4a4e69] to-[#9a8c98] dark:from-[#232946] dark:via-[#121629] dark:to-[#393d63] text-gray-100 dark:text-white pt-8 sm:pt-12 pb-4 sm:pb-6 px-2">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8 text-center sm:text-left place-items-center items-start">
+          {/* About */}
+          <div className="col-span-1 flex flex-col gap-3 items-center">
+            <div className="flex items-center mb-2">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-white" />
               </div>
-              <span className="ml-3 text-xl font-bold">EventFlow</span>
+              <span className="ml-3 text-2xl font-extrabold bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">EventFlow</span>
             </div>
-            <p className="text-gray-300 text-base leading-relaxed mb-6 max-w-md">
-              The most intuitive event management platform for modern teams. Create, manage, and analyze events with powerful tools.
+            <p className="text-gray-200 dark:text-gray-300 text-base leading-relaxed max-w-xs text-center">
+              Effortlessly create, manage, and track your events. EventFlow empowers teams and communities to connect, collaborate, and celebrate with ease.
             </p>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center">
-                <Mail className="h-4 w-4 text-purple-400 mr-2" />
-                <a href="mailto:hello@eventflow.com" className="text-gray-300 hover:text-white transition-colors">
-                  hello@eventflow.com
-                </a>
-              </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="col-span-1 flex flex-col items-center">
+            <h3 className="text-lg font-bold mb-3 text-white">Quick Links</h3>
+            <ul className="space-y-2 text-center mx-auto">
+              <li><a href="/events" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Events</a></li>
+              <li><a href="/calendar" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Calendar</a></li>
+              <li><a href="/profile" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Profile</a></li>
+              <li><a href="/create-event" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Create Event</a></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div className="col-span-1 flex flex-col items-center">
+            <h3 className="text-lg font-bold mb-3 text-white">Contact</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <Mail className="h-5 w-5 text-purple-500" />
+              <a href="mailto:support@eventflow.com" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">support@eventflow.com</a>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-200 dark:text-gray-300">For help & feedback</span>
             </div>
           </div>
 
-          {/* Social Links */}
-          <div className="flex justify-start md:justify-end">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Connect With Us</h3>
-              <div className="flex gap-3">
-                <span
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-purple-600 transition-all duration-300 group"
-                >
-                  <Linkedin className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                </span>
-                <span
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-purple-600 transition-all duration-300 group"
-                >
-                  <Mail className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                </span>
-              </div>
+          {/* Social */}
+          <div className="col-span-1 flex flex-col items-center">
+            <h3 className="text-lg font-bold mb-3 text-white">Connect</h3>
+            <div className="flex gap-3">
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/80 dark:bg-gray-800/80 rounded-lg flex items-center justify-center hover:bg-blue-500 hover:text-white dark:hover:bg-blue-600 transition-all duration-300 group shadow">
+                <Linkedin className="h-5 w-5 text-[#232946] dark:text-white group-hover:scale-110 transition-transform" />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/80 dark:bg-gray-800/80 rounded-lg flex items-center justify-center hover:bg-pink-500 hover:text-white dark:hover:bg-pink-600 transition-all duration-300 group shadow">
+                <Instagram className="h-5 w-5 text-[#232946] dark:text-white group-hover:scale-110 transition-transform" />
+              </a>
+              <a href="#" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/80 dark:bg-gray-800/80 rounded-lg flex items-center justify-center hover:bg-blue-400 hover:text-white dark:hover:bg-blue-500 transition-all duration-300 group shadow">
+                <Twitter className="h-5 w-5 text-[#232946] dark:text-white group-hover:scale-110 transition-transform" />
+              </a>
             </div>
           </div>
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-700 pt-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-400 text-sm">
-              © {new Date().getFullYear()} EventFlow. All rights reserved.
+        <div className="border-t border-gray-300 dark:border-gray-700 pt-4 sm:pt-6">
+          <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+            <p className="text-gray-200 dark:text-gray-300 text-xs sm:text-sm text-center md:text-left">
+              © {new Date().getFullYear()} EventFlow. Created by ♥ Abhinav Sharma
             </p>
-            <div className="flex items-center gap-6">
-              <span
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Privacy Policy
-              </span>
-              <span
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Terms of Service
-              </span>
-              <span
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Cookie Policy
-              </span>
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 justify-center md:justify-end">
+              <a href="#" className="text-gray-200 dark:text-gray-300 hover:text-purple-300 dark:hover:text-purple-400 text-xs sm:text-sm transition-colors">Privacy Policy</a>
+              <a href="#" className="text-gray-200 dark:text-gray-300 hover:text-purple-300 dark:hover:text-purple-400 text-xs sm:text-sm transition-colors">Terms of Service</a>
+              <a href="#" className="text-gray-200 dark:text-gray-300 hover:text-purple-300 dark:hover:text-purple-400 text-xs sm:text-sm transition-colors">Cookie Policy</a>
             </div>
           </div>
         </div>
