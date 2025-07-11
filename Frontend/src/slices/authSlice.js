@@ -7,6 +7,17 @@ const initialState = {
   error: null,
 };
 
+export const login = createAsyncThunk('auth/login',
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post('/auth/login', data);
+      return res.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Login failed');
+    }
+  }
+);
+
 export const logout = createAsyncThunk('auth/logout',
   async (_, { rejectWithValue }) => {
     try {
@@ -29,6 +40,18 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentUser = action.payload;
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(logout.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -41,7 +64,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-
   }
 });
 
