@@ -116,7 +116,7 @@ const LoginPage = () => {
           </div>
           <button
             type="submit"
-            className="mx-auto block bg-gradient-to-r from-blue-500 to-pink-500 text-white dark:text-white rounded-full font-semibold text-base px-8 py-3 shadow-lg hover:from-blue-600 hover:to-pink-600 hover:scale-105 active:scale-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mt-2 flex items-center justify-center gap-2"
+            className="mx-auto bg-gradient-to-r from-blue-500 to-pink-500 text-white dark:text-white rounded-full font-semibold text-base px-8 py-3 shadow-lg hover:from-blue-600 hover:to-pink-600 hover:scale-105 active:scale-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mt-2 flex items-center justify-center gap-2"
             disabled={loading}
             aria-busy={loading}
           >
