@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Plus,
@@ -13,210 +13,224 @@ import {
   Trash2,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
-import EventCard from '../components/Events/EventCard';
+import { useDispatch, useSelector } from 'react-redux';
 
-const initialEvents = [
-  {
-    id: '1',
-    title: 'React Conference',
-    description: 'A deep dive into React 18 features.',
-    location: 'Online',
-    date: '2025-07-01',
-    time: '10:00 AM',
-    image: 'https://images.pexels.com/photos/573589/pexels-photo-573589.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    attendees: 120,
-    capacity: 200,
-  },
-  {
-    id: '2',
-    title: 'Next.js Meetup',
-    description: 'Meet and connect with Next.js developers.',
-    location: 'Bangalore',
-    date: '2025-07-15',
-    time: '2:00 PM',
-    image: 'https://images.pexels.com/photos/716411/pexels-photo-716411.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    attendees: 45,
-    capacity: 100,
-  },
-];
+import { axiosInstance } from '../lib/axios';
+import DeleteConfirmationModal from '../components/Events/DeleteConfirmationModal';
+import { fetchMyEvents, fetchAttendingEvents, deleteEvent } from '../slices/eventSlice.js';
+const EventCard = React.memo(lazy(() => import('../components/Events/EventCard')));
+
 
 const EventsPage = () => {
-  const [events, setEvents] = useState(initialEvents);
+  const dispatch = useDispatch();
+  const { events, attendingEvents, loading, error } = useSelector(state => state.events);
+  const currentUser = useSelector(state => state.auth.currentUser);
+  const isAuthenticated = !!currentUser;
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('grid');
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, eventId: null, eventName: '', isOwner: false });
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase());
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchMyEvents());
+      dispatch(fetchAttendingEvents());
+    }
+  }, [dispatch, isAuthenticated]);
 
-    return matchesSearch;
-  });
+  const filteredEvents = events
+    .filter((event) => {
+      const matchesSearch =
+        (event.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (event.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (event.location || '').toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesSearch;
+    })
+    .sort((a, b) => {
+      // latest events first
+      const createdA = a.createdAt ? new Date(a.createdAt) : (a.data ? new Date(a.date) : 0);
+      const createdB = b.createdAt ? new Date(b.createdAt) : (b.date ? new Date(b.date) : 0);
+      return createdB - createdA;
+    });
 
-  const handleDeleteEvent = (eventId, eventTitle) => {
-    const eventToDelete = events.find(event => event.id === eventId);
-    const title = eventTitle || eventToDelete?.title || 'this event';
+  const handleDeleteEvent = (eventId, eventTitle, isOwner) => {
+    setDeleteModal({ isOpen: true, eventId, eventName: eventTitle, isOwner });
+  };
 
-    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      setEvents((prev) => prev.filter((event) => event.id !== eventId));
-      toast.success('Event deleted successfully');
+  const confirmDelete = async () => {
+    try {
+      if (deleteModal.isOwner) {
+        await dispatch(deleteEvent(deleteModal.eventId));
+        toast.success('Event deleted successfully');
+      }
+      else {
+        // attendee leave event
+        await axiosInstance.post(`/event/leaveEvent/${deleteModal.eventId}`);
+        toast.success('You have left the event successfully');
+      }
+
+      setDeleteModal({ isOpen: false, eventId: null, eventName: '', isOwner: false });
+      dispatch(fetchMyEvents());
+      dispatch(fetchAttendingEvents());
+    } catch (error) {
+      toast.error(error.message || 'Failed to process request');
+      setDeleteModal({ isOpen: false, eventId: null, eventName: '', isOwner: false });
     }
   };
 
-  return (
-    <div className="space-y-8 bg-gradient-to-tr from-green-400 via-teal-500 to-blue-700 min-h-screen pt-30 pb-10 px-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Events</h1>
-          <p className="mt-1 text-gray-100">Manage all your events in one place</p>
-        </div>
-        <Link
-          to="/create-event"
-          className="inline-flex items-center justify-center px-6 py-3 text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg shadow hover:from-purple-700 hover:to-blue-700 transition duration-200 text-sm sm:text-base"
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          Create Event
-        </Link>
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, eventId: null, eventName: '', isOwner: false });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading events...</p>
       </div>
+    );
+  }
 
-      {/* Filters and Search */}
-      <div className="bg-white rounded-lg shadow p-3 sm:p-4 max-w-4xl mx-auto">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:flex-row md:items-center md:justify-between">
-          {/* Search Input */}
-          <div className="w-full sm:w-auto sm:flex-1">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search events..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
+  // Before rendering, ensure attendingEvents is always an array
+  const safeAttendingEvents = Array.isArray(attendingEvents) ? attendingEvents : [];
+
+  return (
+    <main className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 flex flex-col items-center justify-start pt-10 pb-20 px-2">
+      <section className="w-full max-w-6xl mx-auto bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-2xl p-6 md:p-12 mt-8 backdrop-blur-lg border border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div className="flex flex-col items-center w-fit mx-auto sm:mx-0">
+            <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-2 text-center">Events</h1>
+            <span className="block h-1 w-full rounded-full bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500" />
+            <p className="mt-2 text-gray-700 dark:text-gray-200 text-center">Manage all your events in one place</p>
           </div>
-
-          {/* View Mode Toggle */}
-          <div className="w-full sm:w-auto flex items-center justify-center sm:justify-end gap-2 bg-gray-100 rounded-md px-2 py-1">
+          <Link
+            to="/create-event"
+            className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-500 to-pink-500 text-white rounded-full font-semibold shadow-lg hover:from-blue-600 hover:to-pink-600 hover:scale-105 transition text-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            Create Event
+          </Link>
+        </div>
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700 shadow focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            />
+          </div>
+          <div className="flex gap-2 items-center justify-center">
             <button
               onClick={() => setViewMode('grid')}
-              className={`w-1/2 sm:w-auto text-sm px-3 py-1 rounded-md font-medium transition ${viewMode === 'grid' ? 'bg-white text-purple-600 shadow' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`px-6 py-2 rounded-full font-semibold transition-all text-sm shadow ${viewMode === 'grid'
+                ? 'bg-gradient-to-r from-blue-500 to-pink-500 text-white scale-105'
+                : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-200 hover:bg-white/80 dark:hover:bg-gray-700'}`}
             >
               Grid
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`w-1/2 sm:w-auto text-sm px-3 py-1 rounded-md font-medium transition ${viewMode === 'list' ? 'bg-white text-purple-600 shadow' : 'text-gray-600 hover:text-gray-900'}`}
+              className={`px-6 py-2 rounded-full font-semibold transition-all text-sm shadow ${viewMode === 'list'
+                ? 'bg-gradient-to-r from-blue-500 to-pink-500 text-white scale-105'
+                : 'bg-white/60 dark:bg-gray-800/60 text-gray-700 dark:text-gray-200 hover:bg-white/80 dark:hover:bg-gray-700'}`}
             >
               List
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Events Display */}
-      <div>
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl shadow">
-            <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
-            <p className="text-gray-500 mb-6">
-              {searchTerm
-                ? 'Try adjusting your search criteria'
-                : 'Get started by creating your first event'}
-            </p>
-            <Link
-              to="/events/create"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg shadow hover:from-purple-700 hover:to-blue-700 transition"
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              Create Your First Event
-            </Link>
+        {/* My Events Section */}
+        <div className="mb-16">
+          <div className="flex flex-col items-center w-fit mx-auto mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-500 via-cyan-400 to-green-400 bg-clip-text text-transparent mb-2 text-center">My Events</h2>
+            <span className="block h-1 w-full rounded-full bg-gradient-to-r from-blue-500 via-cyan-400 to-green-400" />
           </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredEvents.map((event, index) => (
-              <div key={event.id} className="relative">
-                <Link
-                  to={`/events/${event.id}`}
-                  className="absolute inset-0 z-10"
-                  aria-label={`View details for ${event.title}`}
-                />
-                <EventCard
-                  index={index}
-                  event={event}
-                  handleDeleteEvent={(id) => handleDeleteEvent(id, event.title)}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl shadow divide-y">
-            {filteredEvents.map((event, index) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="p-4 flex flex-col sm:flex-row gap-4 items-center sm:items-start hover:bg-gray-50 cursor-pointer relative"
+          {filteredEvents.length === 0 ? (
+            <div className="text-center py-16 bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg flex flex-col items-center">
+              <span className="text-lg text-gray-500 dark:text-gray-300 mb-4">No events found</span>
+              <Link
+                to="/create-event"
+                className="inline-flex items-center px-6 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white rounded-full font-semibold shadow hover:from-blue-600 hover:to-pink-600 hover:scale-105 transition"
               >
-                <Link to={`/events/${event.id}`} className="absolute inset-0 z-10" aria-label={`View details for ${event.title}`}></Link>
-                {event.image && (
-                  <img src={event.image} alt={event.title} className="w-full h-32 sm:w-48 object-cover rounded-lg flex-shrink-0" />
-                )}
-                <div className="flex-1 min-w-0 flex flex-col justify-center">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-1 gap-2 sm:gap-0">
-                    <h3 className="text-lg font-medium text-gray-900 truncate flex-grow">{event.title}</h3>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First Event
+              </Link>
+            </div>
+          ) : (
+            <div className="py-8 px-2 max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+                {filteredEvents.map((event, index) => (
+                  <div key={event._id || index} className="relative">
+                    <Suspense fallback={<div>Loading event card...</div>}>
+                      <EventCard
+                        index={index}
+                        event={event}
+                        handleDeleteEvent={(id) => handleDeleteEvent(id, event.title, true)}
+                        currentUserId={currentUser?._id}
+                        showCreatorInfo={false}
+                      />
+                    </Suspense>
                   </div>
-                  <p className="text-sm text-gray-600 truncate mb-2">{event.description}</p>
-                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500">
-                    <div className="flex items-center"><Calendar className="h-4 w-4 mr-1" /> {format(new Date(event.date), 'MMM d,yyyy')}</div>
-                    <div className="flex items-center"><Clock className="h-4 w-4 mr-1" /> {event.time}</div>
-                    <div className="flex items-center"><MapPin className="h-4 w-4 mr-1" /> {event.location}</div>
-                    <div className="flex items-center"><Users className="h-4 w-4 mr-1" /> {event.attendees}/{event.capacity}</div>
-                  </div>
-                </div>
-                <div className="flex gap-1 relative z-20 flex-shrink-0 mt-2 sm:mt-0">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors shadow-sm"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label="View event"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-lg transition-colors shadow-sm"
-                    onClick={(e) => e.stopPropagation()}
-                    aria-label="Edit event"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={(e) => { e.stopPropagation(); handleDeleteEvent(event.id, event.title); }}
-                    className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors shadow-sm"
-                    aria-label="Delete event"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </motion.button>
-                </div>
-              </motion.div>
-            ))}
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Events I'm Attending Section */}
+        <div>
+          <div className="flex flex-col items-center w-fit mx-auto mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-500 via-red-400 to-yellow-400 bg-clip-text text-transparent mb-2 text-center">Events I'm Attending</h2>
+            <span className="block h-1 w-full rounded-full bg-gradient-to-r from-pink-500 via-red-400 to-yellow-400" />
           </div>
-        )}
-      </div>
-    </div>
+          {safeAttendingEvents.length === 0 ? (
+            <div className="text-center py-16 bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg flex flex-col items-center">
+              <span className="text-lg text-gray-500 dark:text-gray-300">No attending events found</span>
+            </div>
+          ) : (
+            <div className="py-8 px-2 max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+                {safeAttendingEvents
+                  .slice()
+                  .sort((a, b) => {
+                    const dateA = a.date ? new Date(a.date) : (a.createdAt ? new Date(a.createdAt) : 0);
+                    const dateB = b.date ? new Date(b.date) : (b.createdAt ? new Date(b.createdAt) : 0);
+                    return dateB - dateA;
+                  })
+                  .map((event, index) => (
+                    <div key={event._id || index} className="relative">
+                      <Suspense fallback={<div>Loading event card...</div>}>
+                        <EventCard
+                          index={index}
+                          event={event}
+                          handleDeleteEvent={(id) => handleDeleteEvent(id, event.title, false)}
+                          currentUserId={currentUser?._id}
+                          showCreatorInfo={true}
+                        />
+                      </Suspense>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDelete}
+        eventName={deleteModal.eventName}
+        loading={loading}
+        isOwner={deleteModal.isOwner}
+      />
+    </main>
   );
 };
 
