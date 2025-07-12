@@ -1,107 +1,191 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, Eye, Edit, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Eye, Edit, Trash2, Phone as PhoneIcon, Share2, Clock } from 'lucide-react';
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-const EventCard = ({ event, index, handleDeleteEvent, setSelectedEvent, setShowEventModal }) => {
+const EventCard = ({ event, index, handleDeleteEvent, setSelectedEvent, setShowEventModal, currentUserId, showCreatorInfo }) => {
+
+  const navigate = useNavigate();
+  const isOwner =
+    event.creator &&
+    (
+      (typeof event.creator === 'object' && event.creator._id === currentUserId) ||
+      (typeof event.creator === 'object' && event.creator === currentUserId)
+    );
+
+  const isAttendee = !isOwner && event.attendees && event.attendees.some(a => (a._id || a) === currentUserId);
+
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
+
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
+  };
+
+  const handleWhatsAppShare = () => {
+    const organizerName = event.creator?.fullName || '';
+    const organizerMobile = event.creator?.mobileNumber || '';
+
+    const text =
+      `✨ *You're Invited!* ✨\n\n` +
+      `*Event Name:* ${event.title}*\n` +
+      `------------------------------\n` +
+      `📝 *About:* ${event.description}\n` +
+      `\n` +
+      `📅 *Date:* ${event.date ? format(new Date(event.date), 'dddd, MMMM d, yyyy') : ''}\n` +
+      `⏰ *Time:* ${event.time || ''}\n` +
+      `📍 *Location:* ${event.location}\n` +
+      `\n` +
+      `👤 *Organizer:* ${organizerName}\n` +
+      `📞 *Contact:* ${organizerMobile}\n` +
+      `------------------------------`;
+
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+    setShowShareModal(false);
+  };
+
+  const onDelete = () => {
+    handleDeleteEvent(event._id, event.title, isOwner);
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="group bg-white/80 backdrop-blur-sm rounded-lg sm:rounded-xl lg:rounded-2xl border border-white/20 overflow-hidden shadow-sm hover:shadow-lg lg:hover:shadow-xl transition-all duration-500 h-full flex flex-col"
-    >
-      {/* Image Section with responsive heights */}
-      <div className="relative h-32 xs:h-36 sm:h-40 md:h-44 lg:h-48 xl:h-52 2xl:h-56 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent z-10"></div>
+    <div className="bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-xl p-6 flex flex-col gap-4 hover:shadow-2xl transition-all duration-200 w-full max-w-3xl mx-auto backdrop-blur-lg border border-gray-100 dark:border-gray-800">
+      {/* Event Image */}
+      {event.image && (
         <img
           src={event.image}
           alt={event.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+          className="w-full h-56 object-cover rounded-xl mb-4 border border-gray-200 dark:border-gray-800"
         />
-      </div>
-
-      {/* Content Section with responsive padding and spacing */}
-      <div className="p-2.5 xs:p-3 sm:p-4 md:p-5 lg:p-6 space-y-2.5 xs:space-y-3 sm:space-y-4 lg:space-y-5 flex-grow flex flex-col">
-        {/* Title and Description */}
-        <div className="flex-grow">
-          <h3 className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-xl font-bold text-gray-900 mb-1 xs:mb-1.5 sm:mb-2 group-hover:text-purple-600 transition-colors line-clamp-1">
-            {event.title}
-          </h3>
-          <p className="text-gray-600 text-2xs xs:text-xs sm:text-sm md:text-base leading-relaxed line-clamp-2 min-h-[2rem] xs:min-h-[2.5rem] sm:min-h-[3rem]">
-            {event.description}
-          </p>
-        </div>
-
-        {/* Event Details with responsive spacing */}
-        <div className="space-y-1.5 xs:space-y-2 sm:space-y-3">
-          {/* Date and Time */}
-          <div className="flex items-center text-2xs xs:text-xs sm:text-sm md:text-base text-gray-600 bg-gray-50 rounded-md sm:rounded-lg p-1.5 xs:p-2 sm:p-2.5 lg:p-3">
-            <Calendar className="w-3.5 h-3.5 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-4 xl:h-4 mr-1.5 xs:mr-2 sm:mr-3 text-purple-500 flex-shrink-0" />
-            <span className="font-medium truncate">{event.date} at {event.time}</span>
-          </div>
-
-          {/* Location */}
-          <div className="flex items-center text-2xs xs:text-xs sm:text-sm md:text-base text-gray-600 bg-gray-50 rounded-md sm:rounded-lg p-1.5 xs:p-2 sm:p-2.5 lg:p-3">
-            <MapPin className="w-3.5 h-3.5 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-4 xl:h-4 mr-1.5 xs:mr-2 sm:mr-3 text-blue-500 flex-shrink-0" />
-            <span className="font-medium truncate">{event.location}</span>
-          </div>
-
-          {/* Attendees and Capacity */}
-          <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 to-blue-50 rounded-md sm:rounded-lg p-1.5 xs:p-2 sm:p-2.5 lg:p-3">
-            <div className="flex items-center text-2xs xs:text-xs sm:text-sm md:text-base text-gray-600">
-              <Users className="w-3.5 h-3.5 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-4 xl:h-4 mr-1.5 xs:mr-2 sm:mr-3 text-emerald-500 flex-shrink-0" />
-              <span className="font-medium truncate">{event.attendees}/{event.capacity}</span>
+      )}
+      <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1 capitalize">{
+        event.title && event.title.length > 30
+          ? event.title.slice(0, 30) + '...'
+          : event.title
+      }</h3>
+      <p className="text-gray-600 dark:text-gray-300 text-base mb-2">{
+        (() => {
+          if (!event.description) return '';
+          if (event.description.length <= 30) return event.description;
+          return event.description.slice(0, 30) + '...';
+        })()
+      }</p>
+      <div className="flex flex-col gap-3">
+        {/* Creator Info */}
+        {showCreatorInfo && event.creator && (
+          <>
+            <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 rounded-xl px-4 py-2">
+              <Users className="h-5 w-5 text-purple-500" />
+              <span className="text-gray-800 dark:text-gray-200 font-medium">Creator: {event.creator.fullName}</span>
             </div>
-            <div className="text-right min-w-[50px] xs:min-w-[60px] sm:min-w-[70px] lg:min-w-[80px]">
-              <div className="text-3xs xs:text-2xs sm:text-xs text-gray-500 truncate">Capacity</div>
-              <div className="w-8 xs:w-10 sm:w-12 md:w-14 lg:w-16 bg-gray-200 rounded-full h-1 xs:h-1.5 sm:h-2 mt-0.5 sm:mt-1">
-                <div
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(100, (event.attendees / event.capacity) * 100)}%` }}
-                ></div>
+            {event.creator.mobileNumber && (
+              <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 rounded-xl px-4 py-2 mt-2">
+                <PhoneIcon className="h-5 w-5 text-green-500" />
+                <span className="text-gray-800 dark:text-gray-200 font-medium">Mobile: {event.creator.mobileNumber}</span>
               </div>
+            )}
+          </>
+        )}
+        <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 rounded-xl px-4 py-2">
+          <Calendar className="h-5 w-5 text-pink-500" />
+          <span className="text-gray-800 dark:text-gray-200 font-medium">
+            {event.date ? format(new Date(event.date), 'MMMM d, yyyy') : ''}
+          </span>
+          <Clock className="h-5 w-5 text-purple-500 ml-4" />
+          <span className="text-gray-800 dark:text-gray-200 font-medium">{event.time || ''}</span>
+        </div>
+        <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 rounded-xl px-4 py-2">
+          <MapPin className="h-5 w-5 text-blue-500" />
+          <span className="text-gray-800 dark:text-gray-200 font-medium">{
+            event.location && event.location.length > 20
+              ? event.location.slice(0, 20) + '...'
+              : event.location
+          }</span>
+        </div>
+        <div className="flex items-center gap-2 bg-white/70 dark:bg-gray-800/70 rounded-xl px-4 py-2">
+          <Users className="h-5 w-5 text-green-500" />
+          <span className="text-gray-800 dark:text-gray-200 font-medium">{event.attendees?.length || 0}/{event.maxAttendees || 10}</span>
+          <span className="ml-2 text-xs text-gray-500">Max Attendees</span>
+          <div className="flex-1 ml-4">
+            <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full rounded-full bg-gradient-to-r from-blue-400 to-pink-400" style={{ width: `${((event.attendees?.length || 0) / (event.maxAttendees || 10)) * 100}%` }} />
             </div>
           </div>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-center pt-1.5 xs:pt-2 sm:pt-3 border-t border-gray-100">
-          <div className="flex space-x-0.5 xs:space-x-1 sm:space-x-2">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => {
-                setSelectedEvent(event);
-                setShowEventModal(true);
-              }}
-              className="p-1 xs:p-1.5 sm:p-2 lg:p-2.5 text-blue-600 hover:bg-blue-100 rounded-md sm:rounded-lg transition-colors shadow-sm"
-              aria-label="View event"
-            >
-              <Eye className="w-3.5 h-3.5 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-1 xs:p-1.5 sm:p-2 lg:p-2.5 text-emerald-600 hover:bg-emerald-100 rounded-md sm:rounded-lg transition-colors shadow-sm"
-              aria-label="Edit event"
-            >
-              <Edit className="w-3.5 h-3.5 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleDeleteEvent(event.id)}
-              className="p-1 xs:p-1.5 sm:p-2 lg:p-2.5 text-red-500 hover:bg-red-100 rounded-md sm:rounded-lg transition-colors shadow-sm"
-              aria-label="Delete event"
-            >
-              <Trash2 className="w-3.5 h-3.5 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />
-            </motion.button>
-          </div>
+      </div>
+      <div className="flex justify-center gap-4 mt-6">
+        <div className="relative group">
+          <button
+            className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-800 transition"
+            title="View"
+            onClick={() => navigate(`/events/${event._id}`)}
+          >
+            <Eye className="h-5 w-5" />
+          </button>
+          <span className="absolute left-1/2 -bottom-8 -translate-x-1/2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">View</span>
+        </div>
+        {isOwner && (
+          <>
+            <div className="relative group">
+              <button
+                className="p-3 rounded-xl bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-800 transition"
+                title="Edit"
+                onClick={() => {
+                  const now = new Date();
+                  const eventDate = event.date ? new Date(event.date) : null;
+                  if (eventDate && eventDate < now) {
+                    toast.info('This event is in the past and cannot be edited. Consider deleting it instead.');
+                    return;
+                  }
+                  navigate(`/create-event/${event._id}`, { state: { eventData: event } });
+                }}
+              >
+                <Edit className="h-5 w-5" />
+              </button>
+              <span className="absolute left-1/2 -bottom-8 -translate-x-1/2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">Edit</span>
+            </div>
+            <div className="relative group">
+              <button
+                className="p-3 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-800 transition"
+                title="Share"
+                onClick={handleShare}
+              >
+                <Share2 className="h-5 w-5" />
+              </button>
+              <span className="absolute left-1/2 -bottom-8 -translate-x-1/2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">Share</span>
+            </div>
+          </>
+        )}
+        <div className="relative group">
+          <button className="p-3 rounded-xl bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 transition" title="Delete" onClick={onDelete}>
+            <Trash2 className="h-5 w-5" />
+          </button>
+          <span className="absolute left-1/2 -bottom-8 -translate-x-1/2 px-2 py-1 rounded bg-gray-800 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">Delete</span>
         </div>
       </div>
-    </motion.div>
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 flex flex-col items-center gap-6 relative min-w-[280px]">
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" onClick={handleCloseShareModal}>&times;</button>
+            <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Share Event</h3>
+            <button
+              className="flex flex-col items-center gap-2 px-6 py-3 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 font-semibold text-base shadow transition"
+              onClick={handleWhatsAppShare}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="#25D366" d="M16 3C9.373 3 4 8.373 4 15c0 2.65.87 5.1 2.36 7.1L4 29l7.18-2.32A12.94 12.94 0 0 0 16 27c6.627 0 12-5.373 12-12S22.627 3 16 3zm0 22c-1.77 0-3.48-.46-4.98-1.32l-.36-.21l-4.26 1.38l1.4-4.14l-.23-.37A9.93 9.93 0 0 1 6 15c0-5.52 4.48-10 10-10s10 4.48 10 10s-4.48 10-10 10zm5.07-7.75c-.28-.14-1.65-.81-1.9-.9c-.25-.09-.43-.14-.61.14c-.18.28-.7.9-.86 1.08c-.16.18-.32.2-.6.07c-.28-.14-1.18-.44-2.25-1.4c-.83-.74-1.39-1.65-1.55-1.93c-.16-.28-.02-.43.12-.57c.13-.13.28-.34.42-.51c.14-.17.18-.29.28-.48c.09-.18.05-.35-.02-.49c-.07-.14-.61-1.47-.84-2.01c-.22-.53-.45-.46-.61-.47c-.16-.01-.35-.01-.54-.01c-.19 0-.5.07-.76.35c-.26.28-1 1-.97 2.43c.03 1.43 1.03 2.81 1.18 3c.14.19 2.03 3.1 5.02 4.23c.7.24 1.25.38 1.68.49c.71.18 1.36.16 1.87.1c.57-.07 1.65-.67 1.88-1.32c.23-.65.23-1.2.16-1.32c-.07-.12-.25-.19-.53-.33z" /></svg>
+              <span>Share on WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
