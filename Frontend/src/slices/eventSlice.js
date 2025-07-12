@@ -43,6 +43,17 @@ export const deleteEvent = createAsyncThunk('events/deleteEvent',
   }
 );
 
+export const fetchEventById = createAsyncThunk('events/fetchEventById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get(`/event/getSingleEvent/${id}`);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch event');
+    }
+  }
+);
+
 const eventSlice = createSlice({
   name: 'events',
   initialState,
@@ -88,8 +99,21 @@ const eventSlice = createSlice({
       .addCase(deleteEvent.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchEventById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.currentEvent = null;
+      })
+      .addCase(fetchEventById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentEvent = action.payload;
+      })
+      .addCase(fetchEventById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.currentEvent = null;
       });
-
   }
 });
 
