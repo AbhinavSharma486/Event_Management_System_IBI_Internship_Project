@@ -54,6 +54,26 @@ export const fetchEventById = createAsyncThunk('events/fetchEventById',
   }
 );
 
+export const createEvent = createAsyncThunk('events/createEvent',
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post('/event/create-event', data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to create event');
+    }
+  });
+
+export const updateEvent = createAsyncThunk('events/updateEvent',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.put(`/event/updateEvent/${id}`, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to update event');
+    }
+  });
+
 const eventSlice = createSlice({
   name: 'events',
   initialState,
@@ -113,6 +133,30 @@ const eventSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.currentEvent = null;
+      })
+      .addCase(createEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events.unshift(action.payload);
+      })
+      .addCase(createEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events = state.events.map(event => event._id === action.payload._id ? action.payload : event);
+      })
+      .addCase(updateEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });
