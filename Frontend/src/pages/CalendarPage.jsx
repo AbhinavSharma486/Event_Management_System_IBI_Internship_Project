@@ -1,44 +1,43 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar, Clock, MapPin, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, MapPin, Users, RefreshCw } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import { fetchCalendarEvents } from '../slices/eventSlice';
+
+const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const CalendarPage = () => {
-  // Dummy events array instead of using a store
-  const events = [
-    {
-      id: '1',
-      title: 'React Workshop',
-      date: new Date().toISOString(),
-      time: '10:00 AM',
-      location: 'Online',
-      currentAttendees: 25,
-      maxAttendees: 50,
-    },
-    {
-      id: '2',
-      title: 'Team Meeting',
-      date: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
-      time: '2:00 PM',
-      location: 'Office',
-      currentAttendees: 10,
-      maxAttendees: 15,
-    },
-    {
-      id: '3',
-      title: 'Product Launch',
-      date: new Date(new Date().setDate(new Date().getDate() + 3)).toISOString(),
-      time: '5:00 PM',
-      location: 'Headquarters',
-      currentAttendees: 40,
-      maxAttendees: 60,
-    }
-  ];
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { calendarEvents = [], loading, error } = useSelector(state => state.events);
+  const currentUser = useSelector(state => state.auth.currentUser);
+  const isAuthenticated = !!currentUser;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Simplified date functions for this demo
+  useEffect(() => {
+    dispatch(fetchCalendarEvents());
+  }, [dispatch]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      await dispatch(fetchCalendarEvents()).unwrap();
+      toast.success('Calendar refreshed!');
+    } catch (error) {
+      toast.error('Failed to refresh calendar');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // simplified date functions for this demo
   const format = (date, formatStr) => {
-    const options = {
+    const option = {
       'MMMM yyyy': { month: 'long', year: 'numeric' },
       'MMMM d, yyyy': { month: 'long', day: 'numeric', year: 'numeric' },
       'MMM d': { month: 'short', day: 'numeric' },
@@ -74,7 +73,10 @@ const CalendarPage = () => {
   const calendarDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
   const getEventsForDate = (date) => {
-    return events.filter(event => isSameDay(new Date(event.date), date));
+    return calendarEvents.filter(event => {
+      const eventDate = new Date(event.date);
+      return isSameDay(eventDate, date);
+    });
   };
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
@@ -83,218 +85,181 @@ const CalendarPage = () => {
     const newDate = new Date(currentDate);
     if (direction === 'prev') {
       newDate.setMonth(currentDate.getMonth() - 1);
-    } else {
+    }
+    else {
       newDate.setMonth(currentDate.getMonth() + 1);
     }
     setCurrentDate(newDate);
   };
 
-  return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 min-h-screen pt-20 sm:pt-24 lg:pt-30 pb-6 sm:pb-8 lg:pb-10 px-2 sm:px-4 lg:px-6 xl:px-8 bg-gradient-to-tl from-indigo-900 via-fuchsia-800 to-gray-900">
-      {/* Header */}
-      <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Calendar</h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-white opacity-90">
-            View and manage your events in calendar format
-          </p>
+  const handleEventClick = (event) => {
+    navigate(`/event/${event._id}`);
+  };
+
+  const getUpcomingEvents = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return calendarEvents
+      .filter(event => new Date(event.date) >= today)
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .slice(0, 5);
+  };
+
+  const upcomingEvents = getUpcomingEvents();
+
+  if (loading && !refreshing) {
+    return (
+      <div className="min-h-screen pt-20 pb-10 px-4 bg-gradient-to-tl from-indigo-900 via-fuchsia-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg">Loading calendar...</p>
         </div>
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
-        {/* Calendar */}
-        <div className="xl:col-span-3">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
-            {/* Calendar Header */}
-            <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
-                  {format(currentDate, 'MMMM yyyy')}
-                </h2>
-                <div className="flex items-center space-x-1 sm:space-x-2">
-                  <button
-                    onClick={() => navigateMonth('prev')}
-                    className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md sm:rounded-lg transition-colors duration-200"
-                  >
-                    <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </button>
-                  <button
-                    onClick={() => setCurrentDate(new Date())}
-                    className="px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-md sm:rounded-lg transition-colors duration-200"
-                  >
-                    Today
-                  </button>
-                  <button
-                    onClick={() => navigateMonth('next')}
-                    className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md sm:rounded-lg transition-colors duration-200"
-                  >
-                    <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="p-2 sm:p-4 lg:p-6">
-              {/* Weekday Headers */}
-              <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-2 sm:mb-4">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                  <div key={day} className="p-1 sm:p-2 text-center text-xs sm:text-sm font-medium text-gray-500">
-                    <span className="hidden sm:inline">{day}</span>
-                    <span className="sm:hidden">{day.charAt(0)}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Calendar Days */}
-              <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
-                {calendarDays.map((day) => {
-                  const dayEvents = getEventsForDate(day);
-                  const isCurrentMonth = isSameMonth(day, currentDate);
-                  const isSelected = selectedDate && isSameDay(day, selectedDate);
-                  const isTodayDate = isToday(day);
-
-                  return (
-                    <button
-                      key={day.toISOString()}
-                      onClick={() => setSelectedDate(day)}
-                      className={`relative p-1 sm:p-2 h-12 sm:h-16 lg:h-20 xl:h-24 border border-gray-100 rounded-md sm:rounded-lg text-left transition-all duration-200 ${isCurrentMonth
-                        ? 'bg-white hover:bg-gray-50'
-                        : 'bg-gray-50 text-gray-400'
-                        } ${isSelected
-                          ? 'ring-1 sm:ring-2 ring-purple-500 bg-purple-50'
-                          : ''
-                        } ${isTodayDate
-                          ? 'bg-blue-50 border-blue-200'
-                          : ''
-                        }`}
-                    >
-                      <div className={`text-xs sm:text-sm font-medium ${isTodayDate ? 'text-blue-600' : 'text-gray-900'
-                        }`}>
-                        {format(day, 'd')}
-                      </div>
-
-                      {dayEvents.length > 0 && (
-                        <div className="mt-0.5 sm:mt-1 space-y-0.5 sm:space-y-1">
-                          {dayEvents.slice(0, window.innerWidth < 640 ? 1 : 2).map((event) => (
-                            <div
-                              key={event.id}
-                              className="text-xs px-1 sm:px-2 py-0.5 sm:py-1 bg-purple-100 text-purple-800 rounded truncate"
-                            >
-                              <span className="hidden sm:inline">{event.title}</span>
-                              <span className="sm:hidden">•</span>
-                            </div>
-                          ))}
-                          {dayEvents.length > (window.innerWidth < 640 ? 1 : 2) && (
-                            <div className="text-xs text-gray-500 px-1 sm:px-2">
-                              <span className="hidden sm:inline">+{dayEvents.length - 2} more</span>
-                              <span className="sm:hidden">+{dayEvents.length - 1}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 px-1 sm:px-2 py-4 sm:py-8">
+      <div className="w-full max-w-full sm:max-w-3xl lg:max-w-5xl mx-auto flex flex-col md:flex-row gap-4 sm:gap-8">
+        {/* Calendar Card */}
+        <div className="flex-1 bg-white/80 dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl shadow-2xl p-3 sm:p-6 md:p-8 lg:p-10 border border-gray-200 dark:border-gray-800 backdrop-blur-lg min-w-0">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <button
+              className={`p-2 sm:p-2.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 transition ${(currentDate.getFullYear() === new Date().getFullYear() && currentDate.getMonth() === new Date().getMonth()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={() => {
+                // Only allow prev if not at current month/year
+                const now = new Date();
+                if (currentDate.getFullYear() === now.getFullYear() && currentDate.getMonth() === now.getMonth()) return;
+                navigateMonth('prev');
+              }}
+              disabled={currentDate.getFullYear() === new Date().getFullYear() && currentDate.getMonth() === new Date().getMonth()}
+              title="Previous Month"
+            >
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
+            <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500 bg-clip-text text-transparent text-center truncate max-w-[120px] sm:max-w-xs md:max-w-md">
+              {format(currentDate, 'MMMM yyyy')}
+            </h2>
+            <button
+              className="p-2 sm:p-2.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 transition"
+              onClick={() => navigateMonth('next')}
+              title="Next Month"
+            >
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+            </button>
           </div>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-1 sm:mb-2 text-xs sm:text-base">
+            {daysOfWeek.map(day => (
+              <div key={day} className="text-center font-semibold text-gray-700 dark:text-gray-200 py-1 sm:py-2">
+                {day}
+              </div>
+            ))}
+          </div>
+          {/* Calendar Days */}
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
+            {/* Fill empty days at start of month */}
+            {Array(monthStart.getDay()).fill(null).map((_, i) => (
+              <div key={`empty-${i}`} />
+            ))}
+            {calendarDays.map((date, idx) => {
+              const isCurrentMonth = isSameMonth(date, currentDate);
+              const isSelected = selectedDate && isSameDay(date, selectedDate);
+              const hasEvents = getEventsForDate(date).length > 0;
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              if (date < today) return null;
+              return (
+                <button
+                  key={date.toISOString()}
+                  className={`relative flex flex-col items-center justify-center h-8 w-8 sm:h-12 sm:w-full md:h-16 md:w-full rounded-lg sm:rounded-xl border transition-all
+                    ${isSelected ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white border-blue-500 dark:border-purple-500 scale-105 shadow-lg' :
+                      isToday(date) ? 'border-pink-400 dark:border-pink-500 bg-pink-100/60 dark:bg-pink-900/30 text-pink-700 dark:text-pink-200' :
+                        isCurrentMonth ? 'bg-white/70 dark:bg-gray-800/70 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100' :
+                          'bg-gray-100/60 dark:bg-gray-800/30 border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-600'}
+                  `}
+                  onClick={() => setSelectedDate(new Date(date))}
+                  disabled={!isCurrentMonth}
+                >
+                  <span className="font-bold text-xs sm:text-base">{date.getDate()}</span>
+                  {hasEvents && <span className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-gradient-to-r from-blue-500 to-pink-500" />}
+                </button>
+              );
+            })}
+          </div>
           {/* Selected Date Events */}
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-              {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Select a date'}
-            </h3>
-
-            {selectedDate ? (
-              selectedDateEvents.length > 0 ? (
-                <div className="space-y-3 sm:space-y-4">
-                  {selectedDateEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="block p-3 sm:p-4 bg-gray-50 rounded-md sm:rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
-                    >
-                      <h4 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">{event.title}</h4>
-                      <div className="space-y-1 text-xs sm:text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                          {event.time}
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                          <span className="truncate">{event.location}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2 flex-shrink-0" />
-                          {event.currentAttendees}/{event.maxAttendees} attendees
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+          <div className="mt-4 sm:mt-8">
+            {selectedDate && (
+              <div className="bg-white/90 dark:bg-gray-900/90 rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-6 border border-gray-200 dark:border-gray-800 overflow-x-auto">
+                <div className="flex items-center gap-2 mb-2 sm:mb-4">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                  <span className="font-semibold text-gray-900 dark:text-white text-base sm:text-lg">
+                    Events on {format(selectedDate, 'MMMM d, yyyy')}
+                  </span>
                 </div>
-              ) : (
-                <p className="text-gray-500 text-xs sm:text-sm">No events scheduled for this date</p>
-              )
-            ) : (
-              <p className="text-gray-500 text-xs sm:text-sm">Click on a date to view events</p>
+                {selectedDateEvents.length === 0 ? (
+                  <div className="text-gray-500 dark:text-gray-400">No events on this day.</div>
+                ) : (
+                  <ul className="space-y-2 sm:space-y-4">
+                    {selectedDateEvents.map(event => (
+                      <li key={event._id} className="bg-gradient-to-r from-blue-100 via-pink-100 to-purple-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-lg sm:rounded-xl p-2 sm:p-4 flex flex-col md:flex-row md:items-center gap-2 border border-gray-200 dark:border-gray-700 shadow">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-base sm:text-lg text-blue-700 dark:text-blue-300 truncate max-w-[120px] sm:max-w-xs md:max-w-md">{event.title}</span>
+                            <span className="ml-2 text-xs px-2 py-1 rounded-full bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 font-semibold">{event.status || 'Scheduled'}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                            <span className="flex items-center gap-1"><Clock className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" /> {event.time}</span>
+                            <span className="flex items-center gap-1"><MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500" /> {event.location}</span>
+                            <span className="flex items-center gap-1"><Users className="h-3 w-3 sm:h-4 sm:w-4 text-green-500" /> {event.attendees?.length || 0}/{event.maxAttendees || 10}</span>
+                          </div>
+                        </div>
+                        <button
+                          className="px-2 py-1 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold shadow hover:from-blue-600 hover:to-purple-700 transition text-xs sm:text-base"
+                          onClick={() => navigate(`/events/${event._id}`)}
+                        >
+                          View Details
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
           </div>
-
-          {/* Upcoming Events */}
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Upcoming Events</h3>
-
-            <div className="space-y-2 sm:space-y-3">
-              {events
-                .filter(event => new Date(event.date) > new Date())
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .slice(0, 5)
-                .map((event) => (
-                  <div
-                    key={event.id}
-                    className="block p-2 sm:p-3 bg-gray-50 rounded-md sm:rounded-lg hover:bg-gray-100 transition-colors duration-200 cursor-pointer"
-                  >
-                    <h4 className="font-medium text-gray-900 text-xs sm:text-sm mb-1">{event.title}</h4>
-                    <div className="flex items-center text-xs text-gray-600 flex-wrap gap-2 sm:gap-0">
-                      <div className="flex items-center">
-                        <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
-                        {format(new Date(event.date), 'MMM d')}
-                      </div>
-                      <div className="flex items-center sm:ml-2">
-                        <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
-                        {event.time}
-                      </div>
-                    </div>
-                  </div>
+        </div>
+        {/* Upcoming Events Sidebar */}
+        <div className="w-full md:w-80 flex flex-col gap-4 sm:gap-6 min-w-0">
+          <div className="bg-white/80 dark:bg-gray-900/80 rounded-2xl sm:rounded-3xl shadow-2xl p-3 sm:p-6 border border-gray-200 dark:border-gray-800 backdrop-blur-lg flex flex-col gap-2 sm:gap-4">
+            <div className="flex items-center justify-between mb-1 sm:mb-2">
+              <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">Upcoming Events</h3>
+              <button
+                className={`p-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-110 transition ${refreshing ? 'opacity-60 cursor-not-allowed' : ''}`}
+                onClick={handleRefresh}
+                disabled={refreshing}
+                title="Refresh"
+              >
+                {refreshing ? (
+                  <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5" />
+                )}
+              </button>
+            </div>
+            {upcomingEvents.length === 0 ? (
+              <div className="text-gray-500 dark:text-gray-400">No upcoming events.</div>
+            ) : (
+              <ul className="space-y-2 sm:space-y-4">
+                {upcomingEvents.map(event => (
+                  <li key={event._id} className="bg-gradient-to-r from-blue-100 via-pink-100 to-purple-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-lg sm:rounded-xl p-2 sm:p-4 border border-gray-200 dark:border-gray-700 shadow flex flex-col gap-1">
+                    <span className="font-bold text-base sm:text-lg text-blue-700 dark:text-blue-300 truncate max-w-[120px] sm:max-w-xs md:max-w-md">{event.title}</span>
+                    <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1"><Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" /> {format(new Date(event.date), 'MMM d')}</span>
+                    <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1"><Clock className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" /> {event.time}</span>
+                    <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 flex items-center gap-1"><MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500" /> {event.location}</span>
+                  </li>
                 ))}
-
-              {events.filter(event => new Date(event.date) > new Date()).length === 0 && (
-                <p className="text-gray-500 text-xs sm:text-sm">No upcoming events</p>
-              )}
-            </div>
-          </div>
-
-          {/* Calendar Legend */}
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Legend</h3>
-
-            <div className="space-y-2 sm:space-y-3">
-              <div className="flex items-center">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-blue-100 border border-blue-200 rounded mr-2 sm:mr-3 flex-shrink-0"></div>
-                <span className="text-xs sm:text-sm text-gray-600">Today</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-purple-100 rounded mr-2 sm:mr-3 flex-shrink-0"></div>
-                <span className="text-xs sm:text-sm text-gray-600">Has Events</span>
-              </div>
-              <div className="flex items-center">
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-purple-50 border-2 border-purple-500 rounded mr-2 sm:mr-3 flex-shrink-0"></div>
-                <span className="text-xs sm:text-sm text-gray-600">Selected Date</span>
-              </div>
-            </div>
+              </ul>
+            )}
           </div>
         </div>
       </div>

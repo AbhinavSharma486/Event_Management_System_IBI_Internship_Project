@@ -74,6 +74,17 @@ export const updateEvent = createAsyncThunk('events/updateEvent',
     }
   });
 
+export const fetchCalendarEvents = createAsyncThunk('events/fetchCalendarEvents',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get('/event/calendar-events');
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch calendar events');
+    }
+  }
+);
+
 const eventSlice = createSlice({
   name: 'events',
   initialState,
@@ -155,6 +166,18 @@ const eventSlice = createSlice({
         state.events = state.events.map(event => event._id === action.payload._id ? action.payload : event);
       })
       .addCase(updateEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchCalendarEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCalendarEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.calendarEvents = Array.isArray(action.payload) ? action.payload : action.payload?.events || [];
+      })
+      .addCase(fetchCalendarEvents.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
