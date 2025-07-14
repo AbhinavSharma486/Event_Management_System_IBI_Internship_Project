@@ -1,11 +1,13 @@
 import React from 'react';
 import { Calendar, Linkedin, Mail, Instagram, Twitter } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-[#22223b] via-[#4a4e69] to-[#9a8c98] dark:from-[#232946] dark:via-[#121629] dark:to-[#393d63] text-gray-100 dark:text-white pt-8 sm:pt-12 pb-4 sm:pb-6 px-2">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8 text-center sm:text-left place-items-center items-start">
+
           {/* About */}
           <div className="col-span-1 flex flex-col gap-3 items-center">
             <div className="flex items-center mb-2">
@@ -23,10 +25,38 @@ const Footer = () => {
           <div className="col-span-1 flex flex-col items-center">
             <h3 className="text-lg font-bold mb-3 text-white">Quick Links</h3>
             <ul className="space-y-2 text-center mx-auto">
-              <li><a href="/events" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Events</a></li>
-              <li><a href="/calendar" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Calendar</a></li>
-              <li><a href="/profile" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Profile</a></li>
-              <li><a href="/create-event" className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors">Create Event</a></li>
+              <li>
+                <Link
+                  to="/events"
+                  className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                >
+                  Events
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/calendar"
+                  className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                >
+                  Calendar
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/profile"
+                  className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                >
+                  Profile
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/create-event"
+                  className="text-gray-200 hover:text-purple-300 dark:text-gray-300 dark:hover:text-purple-400 transition-colors"
+                >
+                  Create Event
+                </Link>
+              </li>
             </ul>
           </div>
 
