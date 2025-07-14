@@ -11,7 +11,7 @@ dotenv.config();
 import connectDB from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import eventsRoutes from "./routes/events.route.js";
-
+import "./utils/cleanupOldEvents.js";
 
 const app = express();
 
