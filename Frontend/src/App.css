@@ -24,8 +24,8 @@ body {
   .custom-toast-responsive {
     left: 50% !important;
     right: auto !important;
-    top: auto !important;
-    bottom: 1.5rem !important;
+    top: 1.5rem !important;
+    bottom: auto !important;
     transform: translateX(-50%) !important;
     width: 95vw !important;
     max-width: 95vw !important;
