@@ -65,6 +65,6 @@ cron.schedule('0 2 * * *', async () => {
 });
 
 // for manual run (node Backend/utils/cleanupOldEvents.js)
-if (process.argy[1] === new URL(import.meta.url).pathname) {
+if (process.argv[1] === new URL(import.meta.url).pathname) {
   cleanupOldEvents().then(cleanupAttendees).then(() => process.exit(0));
 }
