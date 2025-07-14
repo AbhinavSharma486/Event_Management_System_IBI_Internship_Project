@@ -73,6 +73,19 @@ export const deleteProfile = createAsyncThunk('auth/deleteProfile',
   }
 );
 
+export const checkAuth = createAsyncThunk('auth/checkAuth',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get('/auth/check', {
+        withCredentials: true
+      });
+      return res.data.user || null;
+    } catch (error) {
+      return null;
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -154,6 +167,17 @@ const authSlice = createSlice({
       .addCase(deleteProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentUser = action.payload;
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.loading = false;
+        state.currentUser = null;
       });
   }
 });
