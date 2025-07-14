@@ -40,6 +40,39 @@ export const logout = createAsyncThunk('auth/logout',
   }
 );
 
+export const updateProfile = createAsyncThunk('auth/updateProfile',
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.put('/auth/update-profile', data);
+      return res.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Profile updated failed');
+    }
+  }
+);
+
+export const updatePassword = createAsyncThunk('auth/updatePassword',
+  async (data, { rejectWithValue }) => {
+    try {
+      await axiosInstance.put('/auth/update-profile', data);
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Passowrd update failed');
+    }
+  }
+);
+
+export const deleteProfile = createAsyncThunk('auth/deleteProfile',
+  async (userId, { rejectWithValue }) => {
+    try {
+      await axiosInstance.delete(`/auth/delete/${userId}`);
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Account deletion Failed');
+    }
+  }
+);
+
 
 const authSlice = createSlice({
   name: 'auth',
@@ -84,6 +117,41 @@ const authSlice = createSlice({
         state.currentUser = null;
       })
       .addCase(logout.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentUser = action.payload;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updatePassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updatePassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updatePassword.rejected, (state, action) => [
+        state.loading = false,
+        state.error = action.payload
+      ])
+      .addCase(deleteProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProfile.fulfilled, (state) => {
+        state.loading = false;
+        state.currentUser = null;
+      })
+      .addCase(deleteProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

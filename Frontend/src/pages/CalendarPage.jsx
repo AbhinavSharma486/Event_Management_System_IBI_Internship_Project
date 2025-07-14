@@ -37,7 +37,7 @@ const CalendarPage = () => {
 
   // simplified date functions for this demo
   const format = (date, formatStr) => {
-    const option = {
+    const options = {
       'MMMM yyyy': { month: 'long', year: 'numeric' },
       'MMMM d, yyyy': { month: 'long', day: 'numeric', year: 'numeric' },
       'MMM d': { month: 'short', day: 'numeric' },
