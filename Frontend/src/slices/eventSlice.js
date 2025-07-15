@@ -10,10 +10,10 @@ const initialState = {
   error: null,
 };
 
-export const fetchMyEvents = createAsyncThunk('events/fetchMyEvents',
+export const fetchMyEvents = createAsyncThunk('event/fetchMyEvents',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get('/events/my-events');
+      const res = await axiosInstance.get('/event/my-events');
       return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch events');
@@ -21,7 +21,7 @@ export const fetchMyEvents = createAsyncThunk('events/fetchMyEvents',
   }
 );
 
-export const fetchAttendingEvents = createAsyncThunk('events/fetchAttendingEvents',
+export const fetchAttendingEvents = createAsyncThunk('event/fetchAttendingEvents',
   async (_, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get('/event/attending-events');
@@ -32,7 +32,7 @@ export const fetchAttendingEvents = createAsyncThunk('events/fetchAttendingEvent
   }
 );
 
-export const deleteEvent = createAsyncThunk('events/deleteEvent',
+export const deleteEvent = createAsyncThunk('event/deleteEvent',
   async (IdleDeadline, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(`/event/deleteEvent/${id}`);
@@ -43,7 +43,7 @@ export const deleteEvent = createAsyncThunk('events/deleteEvent',
   }
 );
 
-export const fetchEventById = createAsyncThunk('events/fetchEventById',
+export const fetchEventById = createAsyncThunk('event/fetchEventById',
   async (id, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get(`/event/getSingleEvent/${id}`);
@@ -54,7 +54,7 @@ export const fetchEventById = createAsyncThunk('events/fetchEventById',
   }
 );
 
-export const createEvent = createAsyncThunk('events/createEvent',
+export const createEvent = createAsyncThunk('event/createEvent',
   async (data, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post('/event/create-event', data);
@@ -64,7 +64,7 @@ export const createEvent = createAsyncThunk('events/createEvent',
     }
   });
 
-export const updateEvent = createAsyncThunk('events/updateEvent',
+export const updateEvent = createAsyncThunk('event/updateEvent',
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.put(`/event/updateEvent/${id}`, data);
@@ -74,7 +74,7 @@ export const updateEvent = createAsyncThunk('events/updateEvent',
     }
   });
 
-export const fetchCalendarEvents = createAsyncThunk('events/fetchCalendarEvents',
+export const fetchCalendarEvents = createAsyncThunk('event/fetchCalendarEvents',
   async (_, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get('/event/calendar-events');
