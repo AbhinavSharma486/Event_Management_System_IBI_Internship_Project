@@ -39,9 +39,15 @@ const EventDetailsPage = () => {
     dispatch(fetchEventById(id));
   }, [dispatch, id]);
 
+  // Removed global error handler since errors are handled in catch blocks
+
   const event = currentEvent?.event || null;
-  const isOwner = event?.creator?._id === currentUser?.id;
+  // More robust owner/attendee checks
+  const isOwner = (event?.creator?._id && event?.creator?._id === currentUser?._id) || (typeof event?.creator === 'string' && event?.creator === currentUser?._id);
   const isAttendee = event && !isOwner && event.attendees?.some(a => (a._id || a) === currentUser?._id);
+
+  // Debug log for troubleshooting role-based UI
+  console.log('Event:', event, 'CurrentUser:', currentUser, 'isOwner:', isOwner, 'isAttendee:', isAttendee);
 
   const handleDeleteEvent = () => {
     setDeleteModal({ isOpen: true });
@@ -49,7 +55,6 @@ const EventDetailsPage = () => {
 
   const confirmDelete = async () => {
     if (!event?._id) return;
-
     try {
       await dispatch(deleteEvent(event._id)).unwrap();
       toast.success('Event deleted successfully');
@@ -61,29 +66,23 @@ const EventDetailsPage = () => {
 
   const handleAddAttendeeSubmit = async (e) => {
     e.preventDefault();
-
     if (!event?._id) return;
-
     if (!isOwner) {
       toast.error('Only the event creator can add attendees.');
       setShowAddAttendee(false);
       return;
     }
-
     setAddAttendeeLoading(true);
     setAddAttendeeError("");
-
     try {
       if (!addAttendeeInput) {
-        setAddAttendeeError('Please enter an email or mobile number.');
+        setAddAttendeeError("Please enter an email or mobile number.");
         setAddAttendeeLoading(false);
         return;
       }
-
-      // simple email regex
+      // Simple email regex
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      // simple mobile number regex 
+      // Simple mobile number regex (10-15 digits, can start with +)
       const mobileRegex = /^\+?\d{10,15}$/;
       let payload = {};
       if (emailRegex.test(addAttendeeInput)) {
@@ -95,13 +94,12 @@ const EventDetailsPage = () => {
         setAddAttendeeLoading(false);
         return;
       }
-
       const res = await axiosInstance.post(`/event/addAttendeeToEvent/${event._id}`, payload);
       toast.success(res.data.message || 'Attendee added!');
       setAddAttendeeInput("");
       setShowAddAttendee(false);
       dispatch(fetchEventById(id));
-    } catch (error) {
+    } catch (err) {
       setAddAttendeeError(err.response?.data?.message || err.message);
     } finally {
       setAddAttendeeLoading(false);
@@ -114,12 +112,9 @@ const EventDetailsPage = () => {
 
   const confirmDeleteAttendee = async () => {
     if (!event?._id || !deleteAttendeeModal.attendee) return;
-
     try {
       const attendeeId = deleteAttendeeModal.attendee._id || deleteAttendeeModal.attendee;
-
       await axiosInstance.delete(`/event/${event._id}/removeAttendee/${attendeeId}`);
-
       toast.success('Attendee removed successfully');
       setDeleteAttendeeModal({ isOpen: false, attendee: null });
       dispatch(fetchEventById(id));
@@ -130,16 +125,13 @@ const EventDetailsPage = () => {
 
   const confirmLeave = async () => {
     if (!event?._id) return;
-
     try {
       await axiosInstance.post(`/event/leaveEvent/${event._id}`);
-
-      toast.success('You have left the event successfully');;
+      toast.success('You have left the event');
       setLeaveModal(false);
       navigate('/events');
     } catch (error) {
       toast.error(error.message || 'Failed to leave event');
-
     }
   };
 
@@ -201,7 +193,6 @@ const EventDetailsPage = () => {
   const registrationRate = max ? Math.round((registered / max) * 100) : 0;
   const availableSpots = max - registered;
   const createdDate = event?.createdAt ? format(new Date(event.createdAt), 'MMM d, yyyy') : '';
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-pink-100 to-purple-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 pb-12">
@@ -277,7 +268,7 @@ const EventDetailsPage = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <InfoCard icon={<Calendar className="h-5 w-5 text-pink-500" />} label="Date" value={event.date ? format(new Date(event.date), 'EEEE, MMMM d, yyyy') : ''} />
               <InfoCard icon={<Clock className="h-5 w-5 text-purple-500" />} label="Time" value={event.time} />
-              <InfoCard icon={<MapPin className="h-5 w-5 text-blue-500" />} label="Location" value={event.location} />
+              <LocationInfoCard icon={<MapPin className="h-5 w-5 text-blue-500" />} label="Location" value={event.location} />
               <InfoCard icon={<Users className="h-5 w-5 text-green-500" />} label="Capacity" value={`${registered}/${max} registered`} />
 
               {event.creator && isAttendee && !isOwner && (
@@ -481,7 +472,6 @@ const EventDetailsPage = () => {
   );
 };
 
-
 // Reusable Components
 const InfoCard = ({ icon, label, value }) => (
   <div className="bg-white/90 dark:bg-gray-900/80 rounded-xl p-4 shadow flex flex-col text-center items-center">
@@ -490,6 +480,22 @@ const InfoCard = ({ icon, label, value }) => (
       <span className="text-xs text-gray-800 dark:text-white">{label}</span>
     </div>
     <p className="font-semibold text-gray-800 dark:text-white text-sm truncate">{value}</p>
+  </div>
+);
+
+// Replace the InfoCard for Location with a custom one that handles long text
+const LocationInfoCard = ({ icon, label, value }) => (
+  <div className="bg-white/90 dark:bg-gray-900/80 rounded-xl p-4 shadow flex flex-col text-center items-center w-full">
+    <div className="flex items-center gap-2 text-gray-500 mb-1">
+      {icon}
+      <span className="text-xs text-gray-800 dark:text-white">{label}</span>
+    </div>
+    <p
+      className="font-semibold text-gray-800 dark:text-white text-sm w-full max-w-full break-words whitespace-normal"
+      style={{ wordBreak: 'break-word' }}
+    >
+      {value}
+    </p>
   </div>
 );
 
@@ -518,9 +524,7 @@ const StatItem = ({ label, value, progress, color }) => (
   <div>
     <div className="flex justify-between text-sm mb-1">
       <span className="text-gray-700 dark:text-gray-300">{label}</span>
-      <span className={`font-semibold ${color.includes('text-') ? color : 'text-blue-600 dark:text-pink-300'}`}>
-        {value}
-      </span>
+      <span className={`font-semibold ${color.includes('text-') ? color : 'text-blue-600 dark:text-pink-300'}`}>{value}</span>
     </div>
     {progress !== undefined && (
       <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
