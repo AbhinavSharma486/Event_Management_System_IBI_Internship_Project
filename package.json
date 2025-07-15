@@ -4,8 +4,8 @@
   "description": "A full-stack MERN (MongoDB, Express.js, React, Node.js) web application for creating, managing, and attending events. This project provides a seamless experience for both event organizers and attendees.",
   "main": "index.js",
   "scripts": {
-    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "npm run start --prefix backend"
+    "build": "npm install --prefix Backend && npm install --prefix Frontend && npm run build --prefix Frontend",
+    "start": "npm run start --prefix Backend"
   },
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/AbhinavSharma486/Event_Management_System_IBI_Internship_Project/issues"
   },
