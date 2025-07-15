@@ -33,7 +33,7 @@ export const fetchAttendingEvents = createAsyncThunk('event/fetchAttendingEvents
 );
 
 export const deleteEvent = createAsyncThunk('event/deleteEvent',
-  async (IdleDeadline, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(`/event/deleteEvent/${id}`);
       return id;

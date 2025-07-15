@@ -181,7 +181,7 @@ export const updateEvent = async (req, res) => {
 export const deleteEvent = async (req, res) => {
   try {
     // fetch the event by id 
-    const event = await Event.findById(req.params.eventId).lean();
+    const event = await Event.findById(req.params.eventId);
 
     // check if the event exists 
     if (!event) {
@@ -194,7 +194,7 @@ export const deleteEvent = async (req, res) => {
     }
 
     // delete the event from db 
-    await Event.findByIdAndDelete(req.params.eventId);
+    await event.deleteOne();
 
     // remove refrence from creator & attendees
     await User.findByIdAndUpdate(req.user._id, {
@@ -361,7 +361,7 @@ export const removeAttendee = async (req, res) => {
     }
 
     // fetch the event 
-    const event = await Event.findById(eventId).lean();
+    const event = await Event.findById(eventId);
 
     if (!event) {
       return res.status(404).json({ success: false, message: "Event not found" });
