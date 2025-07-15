@@ -32,7 +32,29 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-app.use(helmet());
+// Add custom helmet CSP configuration
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: [
+        "'self'",
+        "data:",
+        "https://res.cloudinary.com",
+        "https://randomuser.me",
+        "https://via.placeholder.com"
+      ],
+      connectSrc: ["'self'", "https://res.cloudinary.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
+
 app.use(compression());
 app.use(morgan('combined'));
 
