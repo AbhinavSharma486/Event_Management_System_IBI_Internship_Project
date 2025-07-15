@@ -185,7 +185,7 @@ export const updateProfile = async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true }).lean().exec();
 
-    res.status(200).json({ updatedUser });
+    res.status(200).json({ user: updatedUser });
   } catch (error) {
     console.log("Error in update profile pic controller", error);
     res.status(500).json({ message: "Internal server error" });
