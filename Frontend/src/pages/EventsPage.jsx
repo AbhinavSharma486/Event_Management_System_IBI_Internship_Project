@@ -35,11 +35,11 @@ const EventsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && currentUser && currentUser._id) {
       dispatch(fetchMyEvents());
       dispatch(fetchAttendingEvents());
     }
-  }, [dispatch, isAuthenticated]);
+  }, [dispatch, isAuthenticated, currentUser, currentUser?._id]);
 
   const filteredEvents = events
     .filter((event) => {
@@ -84,6 +84,15 @@ const EventsPage = () => {
   const closeDeleteModal = () => {
     setDeleteModal({ isOpen: false, eventId: null, eventName: '', isOwner: false });
   };
+
+  if (!currentUser || !currentUser._id) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading user...</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { login } from '../slices/authSlice.js';
+import { login, checkAuth } from '../slices/authSlice.js';
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +31,7 @@ const LoginPage = () => {
   const onSubmit = async (data) => {
     try {
       await dispatch(login(data)).unwrap();
+      await dispatch(checkAuth()).unwrap();
       toast.success('Login successful!');
       navigate('/events');
     } catch (error) {

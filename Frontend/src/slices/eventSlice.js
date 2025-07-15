@@ -91,6 +91,12 @@ const eventSlice = createSlice({
   reducers: {
     clearEventError(state) {
       state.error = null;
+    },
+    clearEvents(state) {
+      state.events = [];
+      state.attendingEvents = [];
+      state.calendarEvents = [];
+      state.currentEvent = [];
     }
   },
   extraReducers: (builder) => {
@@ -184,5 +190,5 @@ const eventSlice = createSlice({
   }
 });
 
-export const { clearEvenError } = eventSlice.actions;
+export const { clearEventError, clearEvents } = eventSlice.actions;
 export default eventSlice.reducer;

@@ -9,11 +9,8 @@ const EventCard = ({ event, index, handleDeleteEvent, setSelectedEvent, setShowE
 
   const navigate = useNavigate();
   const isOwner =
-    event.creator &&
-    (
-      (typeof event.creator === 'object' && event.creator._id === currentUserId) ||
-      (typeof event.creator === 'object' && event.creator === currentUserId)
-    );
+    (event.creator && typeof event.creator === 'object' && event.creator._id === currentUserId) ||
+    (event.creator && typeof event.creator === 'string' && event.creator === currentUserId);
 
   const isAttendee = !isOwner && event.attendees && event.attendees.some(a => (a._id || a) === currentUserId);
 
