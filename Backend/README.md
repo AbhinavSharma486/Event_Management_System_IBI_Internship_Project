@@ -1,33 +1,47 @@
 # Event Management System – Backend
 
-## Project Structure
+This is the backend for the Event Management System, built with Node.js, Express, and MongoDB. It provides RESTful APIs for authentication, event management, attendee management, and analytics.
 
+---
+
+## Tech Stack
+- **Node.js** (Express.js)
+- **MongoDB** (Mongoose)
+- **Cloudinary** (image uploads)
+- **JWT** (authentication)
+- **Security:** helmet, express-rate-limit, CORS
+- **Logging:** morgan
+- **Scheduling:** node-cron
+
+---
+
+## Directory Structure
 ```
 Backend/
-├── package.json
-├── package-lock.json
-├── index.js
-├── README.md
-├── controllers/
+├── index.js                # Main server entry point
+├── package.json            # Dependencies and scripts
+├── controllers/            # Route logic (auth, event)
 │   ├── auth.controller.js
 │   └── event.controller.js
-├── lib/
-│   ├── cloudinary.js
-│   └── db.js
-├── middleware/
-│   └── auth.middleware.js
-├── models/
-│   ├── Event.model.js
-│   └── User.model.js
-├── routes/
+├── routes/                 # API route definitions
 │   ├── auth.route.js
 │   └── events.route.js
-├── utils/
+├── models/                 # Mongoose models
+│   ├── User.model.js
+│   └── Event.model.js
+├── middleware/             # Express middleware
+│   └── auth.middleware.js
+├── lib/                    # DB and Cloudinary config
+│   ├── db.js
+│   └── cloudinary.js
+├── utils/                  # Utility scripts
+│   ├── cleanupOldEvents.js
 │   └── generateTokenAndSetCookie.js
-└── temp/ (empty, can be deleted if not needed)
 ```
 
-## Getting Started
+---
+
+## Setup & Installation
 
 1. **Install dependencies:**
    ```bash
@@ -35,90 +49,87 @@ Backend/
    npm install
    ```
 2. **Set up environment variables:**
-   - Create a `.env` file in the Backend directory (see below).
+   - Create a `.env` file in the Backend directory:
+     ```env
+     MONGODB_URI=your_mongodb_connection_string
+     JWT_SECRET=your_jwt_secret
+     CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+     CLOUDINARY_API_KEY=your_cloudinary_api_key
+     CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+     ```
 3. **Run the server:**
    ```bash
-   npm start
-   # or
-   node index.js
+   npm start         # Production
+   npm run dev       # Development (nodemon)
    ```
 
-## Required Environment Variables
-| Variable                  | Description                        |
-|---------------------------|------------------------------------|
-| MONGODB_URI               | MongoDB connection string           |
-| JWT_SECRET                | Secret for JWT token signing        |
-| CLOUDINARY_CLOUD_NAME     | Cloudinary cloud name               |
-| CLOUDINARY_API_KEY        | Cloudinary API key                  |
-| CLOUDINARY_API_SECRET     | Cloudinary API secret               |
+---
 
-**Sample .env:**
-```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-```
+## Scripts (package.json)
+- `npm start` – Start server (node index.js)
+- `npm run dev` – Start server with nodemon
+
+---
+
+## Main Dependencies
+- express, mongoose, dotenv, cors, helmet, express-rate-limit, morgan, cloudinary, bcryptjs, jsonwebtoken, cookie-parser, compression, node-cron, validator
+- dev: nodemon
+
+---
 
 ## API Overview
-- **Auth:** `/api/auth/register`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/profile`
-- **Events:** `/api/events` (CRUD), `/api/events/:id`, `/api/events/:id/attendees`, `/api/events/:id/analytics`
+- **Auth:**
+  - `POST /api/auth/register` – Register user
+  - `POST /api/auth/login` – Login
+  - `POST /api/auth/logout` – Logout
+  - `GET /api/auth/profile` – Get user profile
+- **Events:**
+  - `POST /api/event/create-event` – Create event
+  - `GET /api/event/my-events` – Get events created by user
+  - `GET /api/event/attending-events` – Get events user is attending
+  - `GET /api/event/getSingleEvent/:id` – Get event details
+  - `PUT /api/event/updateEvent/:id` – Update event
+  - `DELETE /api/event/deleteEvent/:id` – Delete event
+  - `POST /api/event/addAttendeeToEvent/:id` – Add attendee
+  - `DELETE /api/event/:eventId/removeAttendee/:userId` – Remove attendee
+  - `POST /api/event/leaveEvent/:id` – Leave event
+  - `GET /api/event/calendar-events` – Get events for calendar
+- See `controllers/` and `routes/` for full details.
 
-See route files for full details.
+---
 
-## Notes
-- The `temp/` folder is currently empty and can be deleted if not required.
-- For production optimization, scaling, and deployment, see deployment documentation or consult your DevOps guide.
+## Key Files
+- **index.js:** Main server, middleware, error handling, and route mounting
+- **controllers/**: Business logic for auth and events
+- **models/**: User and Event schemas
+- **middleware/**: Auth middleware for protected routes
+- **lib/**: DB and Cloudinary config
+- **utils/**: Scheduled cleanup, JWT/cookie helpers
+
+---
+
+## Security & Production
+- Uses helmet, express-rate-limit, and CORS for security
+- JWT for authentication
+- Gzip compression enabled
+- Logging with morgan
+- Scheduled cleanup of old events (node-cron)
+- For production, use PM2 or a process manager
+- Consider Nginx as a reverse proxy
+
+---
 
 ## Troubleshooting
-- **MongoDB connection errors:** Check your `MONGODB_URI` and network/firewall settings.
-- **Cloudinary upload issues:** Verify your Cloudinary credentials.
-- **JWT/auth errors:** Ensure `JWT_SECRET` is set and consistent.
-- **Port conflicts:** Default port is 5000; change in `index.js` if needed.
+- **MongoDB errors:** Check `MONGODB_URI` and network
+- **Cloudinary issues:** Check credentials
+- **JWT/auth errors:** Check `JWT_SECRET`
+- **Port conflicts:** Default is 5000 (set `PORT` in .env if needed)
 
-## Node.js/Express
-- Use PM2 or Node.js cluster mode to utilize all CPU cores:
-  ```bash
-  npm install -g pm2
-  pm2 start index.js -i max
-  ```
-- Set NODE_ENV=production for best performance.
+---
 
-## MongoDB
-- Use MongoDB Atlas or a managed cluster for high availability.
-- Ensure indexes on frequently queried fields (see model comments).
-
-## Nginx (Reverse Proxy)
-- Use Nginx to serve static files and reverse proxy API requests:
-  ```nginx
-  server {
-    listen 80;
-    server_name yourdomain.com;
-    location /api/ {
-      proxy_pass http://localhost:5000/api/;
-      proxy_set_header Host $host;
-      proxy_set_header X-Real-IP $remote_addr;
-    }
-    location / {
-      root /path/to/frontend/dist;
-      try_files $uri $uri/ /index.html;
-    }
-  }
-  ```
-
-## Monitoring & Logging
-- Use tools like PM2, New Relic, or Sentry for monitoring.
-- Use morgan for HTTP logging (already included).
-
-## Rate Limiting & Security
-- express-rate-limit and helmet are enabled for security and abuse prevention.
-
-## Caching
-- For heavy read endpoints, consider Redis caching.
-
-## Screenshots / Demo
-
-You can add your own backend/admin screenshots or API response examples here. Place images in an `assets/` folder at the project root and update this section as needed.
+## Contributing & Support
+- PRs welcome! For major changes, open an issue first.
+- For full-stack context, see the root [README.md](../README.md) and [Frontend/README.md](../Frontend/README.md)
+- For questions, open an issue or contact the maintainer.
 
 --- 
