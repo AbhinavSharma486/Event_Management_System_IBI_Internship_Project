@@ -202,8 +202,8 @@ export const deleteEvent = async (req, res) => {
     });
 
     await User.updateMany(
-      { attendingEvents: req.params.eventId },
-      { $pull: { attendingEvents: req.params.eventId } }
+      { eventAttendees: req.params.eventId },
+      { $pull: { eventAttendees: req.params.eventId } }
     );
 
     return res.status(200).json({
@@ -240,7 +240,7 @@ export const addAttendeToEvent = async (req, res) => {
     }
 
     // find attendee by email or mobile number
-    const attendeeUser = null;
+    let attendeeUser = null;
 
     if (email) {
       attendeeUser = await User.findOne({ email }).lean();
