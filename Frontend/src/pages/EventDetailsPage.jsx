@@ -46,9 +46,6 @@ const EventDetailsPage = () => {
   const isOwner = (event?.creator?._id && event?.creator?._id === currentUser?._id) || (typeof event?.creator === 'string' && event?.creator === currentUser?._id);
   const isAttendee = event && !isOwner && event.attendees?.some(a => (a._id || a) === currentUser?._id);
 
-  // Debug log for troubleshooting role-based UI
-  console.log('Event:', event, 'CurrentUser:', currentUser, 'isOwner:', isOwner, 'isAttendee:', isAttendee);
-
   const handleDeleteEvent = () => {
     setDeleteModal({ isOpen: true });
   };

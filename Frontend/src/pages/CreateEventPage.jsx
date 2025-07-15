@@ -189,7 +189,7 @@ const CreateEventPage = () => {
     const formValues = {
       title: data.title || '',
       description: data.description || '',
-      date: data.date ? format(new Date(data.date), 'yyyy-MM-dd') : '',
+      date: data.date ? new Date(data.date) : null,
       time: data.time || '',
       location: data.location || '',
       maxAttendees: data.maxAttendees ? String(data.maxAttendees) : '',
@@ -250,6 +250,7 @@ const CreateEventPage = () => {
     try {
       const formData = {
         ...data,
+        date: data.date ? format(new Date(data.date), 'yyyy-MM-dd') : '',
         maxAttendees: parseInt(data.maxAttendees) || 0,
       };
 
@@ -423,7 +424,7 @@ const CreateEventPage = () => {
                       <DatePicker
                         {...field}
                         selected={field.value ? new Date(field.value) : null}
-                        onChange={date => field.onChange(date ? format(date, 'yyyy-MM-dd') : '')}
+                        onChange={date => field.onChange(date)}
                         dateFormat="dd-MM-yyyy"
                         placeholderText="dd-mm-yyyy"
                         minDate={new Date()}
