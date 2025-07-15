@@ -474,12 +474,12 @@ const EventDetailsPage = () => {
 
 // Reusable Components
 const InfoCard = ({ icon, label, value }) => (
-  <div className="bg-white/90 dark:bg-gray-900/80 rounded-xl p-4 shadow flex flex-col text-center items-center">
+  <div className="bg-white/90 dark:bg-gray-900/80 rounded-xl p-4 shadow flex flex-col text-center items-center w-full max-w-full">
     <div className="flex items-center gap-2 text-gray-500 mb-1">
       {icon}
       <span className="text-xs text-gray-800 dark:text-white">{label}</span>
     </div>
-    <p className="font-semibold text-gray-800 dark:text-white text-sm truncate">{value}</p>
+    <p className="font-semibold text-gray-800 dark:text-white text-sm w-full max-w-full break-words whitespace-normal" style={{ wordBreak: 'break-word' }}>{value}</p>
   </div>
 );
 
