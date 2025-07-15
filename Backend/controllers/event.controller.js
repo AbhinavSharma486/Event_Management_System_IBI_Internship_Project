@@ -6,7 +6,7 @@ import Event from '../models/Event.model.js';
 // Define commonly used populate configuration for cleaner code reuse
 const populateFields = [
   { path: 'creator', select: 'fullName email mobileNumber' },
-  { path: 'attendees', select: 'FullName email' }
+  { path: 'attendees', select: 'fullName email' }
 ];
 
 
