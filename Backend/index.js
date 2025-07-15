@@ -42,6 +42,7 @@ app.use(
       imgSrc: [
         "'self'",
         "data:",
+        "blob:",
         "https://res.cloudinary.com",
         "https://randomuser.me",
         "https://via.placeholder.com"

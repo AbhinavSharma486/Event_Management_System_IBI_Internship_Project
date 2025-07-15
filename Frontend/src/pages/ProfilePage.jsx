@@ -15,8 +15,8 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState(currentUser?.profilePic || '');
   const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(currentUser?.profilePic || '');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const navigate = useNavigate();
 
