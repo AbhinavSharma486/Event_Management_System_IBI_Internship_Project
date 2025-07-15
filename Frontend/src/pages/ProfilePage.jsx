@@ -41,7 +41,7 @@ const ProfilePage = () => {
     formState: { errors: passwordErrors }
   } = useForm();
 
-  const newPasword = watch('newPassword');
+  const newPassword = watch('newPassword');
 
   // reset form when user data changes
   useEffect(() => {
@@ -122,7 +122,7 @@ const ProfilePage = () => {
     try {
       await dispatch(updatePassword({
         newPassword: data.newPassword,
-        confirmPassword: data.confirmPassword,
+        confirmNewPassword: data.confirmPassword,
       }));
 
       toast.success('Password updated successfully!');
